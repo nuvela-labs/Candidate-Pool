@@ -96,6 +96,9 @@ export function mountLogin(root, { store, go }) {
             : `<p class="muted" style="font-size:13px;line-height:1.6;text-align:center">${isHrs() ? `เฉพาะบัญชี ${esc(HRS)} เท่านั้น` : 'แต่ละแผนกเลือกผู้สมัครได้เฉพาะเข้า Pool ของแผนกตนเอง'}</p>`}
         </section>
       </main>
+      <footer class="login-foot">
+        <a class="btn btn-sm" href="guide.html" target="_blank" rel="noopener" title="เปิดคู่มือในแท็บใหม่">${ICONS.doc} คู่มือการใช้งานสำหรับแผนก</a>
+      </footer>
     </div>`;
 
     if (st.first) {

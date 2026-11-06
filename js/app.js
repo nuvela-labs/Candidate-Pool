@@ -23,18 +23,21 @@ async function route() {
     root.innerHTML = `<div class="loading"><div class="error-box" style="max-width:520px">${esc(errorMessage(e))}</div></div>`;
     return;
   }
-  let hash = location.hash || '#/login';
-  if (!session) hash = '#/login';
-  else if (hash !== homeFor(session)) hash = homeFor(session);
-  if (location.hash !== hash) { location.replace(hash); return; }
-  window.scrollTo(0, 0);
-
   const ctx = {
     store, session,
     go: (h) => { if (location.hash === h) route(); else location.hash = h; },
     signOut: async () => { await store.signOut(); ctx.go('#/login'); },
     onCleanup: (fn) => { cleanup = fn; }
   };
+  let hash = location.hash || '#/login';
+  // #/signin (the user guide's button) always shows the sign-in page, even with a session open;
+  // signing in there replaces that session.
+  if (hash === '#/signin') { window.scrollTo(0, 0); return mountLogin(root, ctx); }
+  if (!session) hash = '#/login';
+  else if (hash !== homeFor(session)) hash = homeFor(session);
+  if (location.hash !== hash) { location.replace(hash); return; }
+  window.scrollTo(0, 0);
+
   if (hash === '#/pjt') return mountPjt(root, ctx);
   if (hash === '#/admin') return mountAdmin(root, ctx);
   return mountLogin(root, ctx);

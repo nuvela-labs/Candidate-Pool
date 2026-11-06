@@ -476,3 +476,4 @@ tbody th { color: var(--ink); border-top: 1px solid #EFEDE7; }
 .icon-only { width: 44px; padding: 0; justify-content: center; }
 .sal-tag { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; background: #FFF6D6; color: #6B4E00; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .card-tags:empty { display: none; }
+.login-foot { display: flex; justify-content: flex-end; padding: 0 clamp(16px, 4vw, 56px) 24px; }

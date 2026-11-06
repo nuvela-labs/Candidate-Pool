@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>คู่มือแผนก · Candidate Pool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='8' cy='8' r='7' fill='%235B3DF5'/%3E%3Cpath d='M17 15a7 7 0 0 1 14 0z' fill='%23FF7A3D'/%3E%3Cpath d='M1 17h14v14A14 14 0 0 1 1 17z' fill='%23111'/%3E%3Ccircle cx='24' cy='24' r='7' fill='%23C8F169'/%3E%3C/svg%3E">
+  <style>
+    /* Guide layout only; every UI sample below uses the app's own classes from css/styles.css. */
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    .guide-hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: center; padding: clamp(24px, 4vw, 44px); border-radius: 36px; background: #111; color: #fff; overflow: hidden; position: relative; }
+    .guide-hero h1 { font-size: clamp(32px, 4.4vw, 56px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; }
+    .guide-hero p { color: #D9D7D0; font-size: 17px; line-height: 1.7; margin-top: 14px; }
+    .hero-shapes { position: relative; min-height: 220px; }
+    .hero-shapes span { position: absolute; }
+    .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: flow; }
+    .flow li { list-style: none; position: relative; padding: 20px 18px 18px; border-radius: 24px; background: #fff; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.55; }
+    .flow li strong { font-size: 16px; }
+    .flow li::before { counter-increment: flow; content: counter(flow); width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 4px; }
+    .flow li:nth-child(1)::before { background: var(--orange); }
+    .flow li:nth-child(2)::before { background: var(--sun); }
+    .flow li:nth-child(3)::before { background: var(--violet); color: #fff; }
+    .flow li:nth-child(4)::before { background: var(--lime); }
+    .flow { padding: 0; margin: 0; }
+
+    .guide-body { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; align-items: start; }
+    .toc { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 24px; background: #fff; max-height: calc(100vh - 40px); overflow: auto; }
+    .toc strong { font-size: 13px; color: var(--muted-2); padding: 6px 12px 8px; }
+    .toc a { display: flex; gap: 10px; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 12px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600; }
+    .toc a:hover { background: var(--soft); color: var(--ink); }
+    .toc a[aria-current="true"] { background: var(--ink); color: #fff; }
+    .toc a .n { font-family: var(--mono); font-size: 12px; opacity: .6; min-width: 18px; }
+
+    .g-section { display: flex; flex-direction: column; gap: 18px; padding-bottom: 44px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .g-section:last-child { border-bottom: 0; }
+    .g-kicker { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--violet-ink); }
+    .g-section > h2 { font-size: clamp(26px, 3vw, 36px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+    .g-lead { font-size: 16px; line-height: 1.75; color: var(--muted); max-width: 72ch; }
+    .g-section h3 { font-size: 18px; font-weight: 700; }
+    .steps { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: st; }
+    .steps li { list-style: none; display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; border-radius: 18px; background: #fff; font-size: 15px; line-height: 1.65; }
+    .steps li::before { counter-increment: st; content: counter(st); flex: none; width: 28px; height: 28px; border-radius: 999px; background: var(--ink); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 1px; }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+
+    /* A frozen sample of the real screen */
+    .demo { position: relative; padding: 22px; border-radius: 28px; background: var(--ground); border: 1.5px dashed var(--line-strong); }
+    .demo-label { position: absolute; top: -12px; left: 20px; padding: 2px 10px; border-radius: 999px; background: var(--ground); font-size: 12px; font-weight: 700; color: var(--muted-2); }
+    .demo [inert], .demo .card, .demo .kpis, .demo .chip-row, .demo .view-switch { pointer-events: none; }
+    .demo .card { max-width: 440px; }
+    .callout { position: absolute; z-index: 2; width: 26px; height: 26px; border-radius: 999px; background: var(--violet); color: #fff; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3px #fff; }
+    .legend-list { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .legend-list li { list-style: none; display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.6; }
+    .legend-list .callout { position: static; flex: none; box-shadow: none; margin-top: 1px; }
+
+    .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .rule { padding: 20px; border-radius: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.6; }
+    .rule strong { font-size: 17px; }
+    .rule .big { font-size: 40px; font-weight: 700; line-height: 1; }
+
+    .g-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 22px; overflow: hidden; font-size: 15px; }
+    .g-table th, .g-table td { padding: 13px 18px; text-align: left; border-bottom: 1px solid #EFEDE7; vertical-align: top; line-height: 1.55; }
+    .g-table thead th { background: var(--soft); font-size: 13px; color: var(--muted-2); }
+    .g-table tr:last-child td, .g-table tr:last-child th { border-bottom: 0; }
+    .tw { overflow-x: auto; border-radius: 22px; }
+    .ok { color: #2B8A3E; font-weight: 700; }
+    .no { color: #B42318; font-weight: 700; }
+
+    .faq details { background: #fff; border-radius: 18px; padding: 0 20px; }
+    .faq details + details { margin-top: 10px; }
+    .faq summary { min-height: 56px; display: flex; align-items: center; font-weight: 700; cursor: pointer; list-style: none; gap: 12px; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; margin-left: auto; font-size: 22px; font-weight: 500; }
+    .faq details[open] summary::after { content: "–"; }
+    .faq details p { padding: 0 0 18px; font-size: 15px; line-height: 1.7; color: var(--muted); }
+    kbd { font-family: var(--mono); font-size: 13px; padding: 1px 7px; border-radius: 6px; background: #fff; border: 1px solid var(--line-strong); }
+
+    @media (max-width: 1020px) {
+      .guide-body { grid-template-columns: minmax(0, 1fr); }
+      .toc { position: static; flex-direction: row; overflow-x: auto; max-height: none; padding: 8px; border-radius: 999px; }
+      .toc strong { display: none; }
+      .toc a { white-space: nowrap; flex: none; }
+      .two { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .guide-hero { grid-template-columns: minmax(0, 1fr); }
+      .hero-shapes { display: none; }
+      .flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    }
+    @media (max-width: 460px) { .flow { grid-template-columns: minmax(0, 1fr); } .demo { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <a href="index.html#/signin" class="logo" data-app><div class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div><span>Candidate Pool</span></a>
+      <span class="unit-badge">คู่มือแผนก</span>
+    </div>
+    <a class="btn btn-sm btn-dark" href="index.html#/signin" data-app>เข้าสู่ระบบ Candidate Pool
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </header>
+
+  <main class="page">
+    <section class="guide-hero" aria-labelledby="hero-title">
+      <div>
+        <h1 id="hero-title">คู่มือใช้งาน<br>Candidate Pool สำหรับแผนก</h1>
+        <p>รวมทุกอย่างที่บัญชีแผนก (PJT) ทำได้ ตั้งแต่เลือกผู้สมัครจาก Candidate Pool ที่ HRS คัดกรองแล้ว พิจารณาภายใน 72 ชั่วโมง ขอนัดสัมภาษณ์ ไปจนถึงเปรียบเทียบผู้สมัครและดูปฏิทินนัด</p>
+      </div>
+      <div class="hero-shapes" aria-hidden="true">
+        <span style="right:120px;top:0;width:120px;height:120px;border-radius:999px;background:var(--violet)"></span>
+        <span style="right:0;top:10px;width:110px;height:110px;border-radius:110px 110px 0 0;background:var(--orange)"></span>
+        <span style="right:120px;top:130px;width:110px;height:100px;border-radius:0 0 0 110px;background:#fff"></span>
+        <span style="right:6px;top:130px;width:100px;height:100px;border-radius:999px;background:var(--lime)"></span>
+      </div>
+    </section>
+
+    <section aria-labelledby="flow-title" style="display:flex;flex-direction:column;gap:14px">
+      <h2 id="flow-title" style="font-size:22px">ภาพรวมการทำงานใน 4 ขั้น</h2>
+      <ol class="flow">
+        <li><strong>เลือกผู้สมัคร</strong>ดูการ์ดในแท็บ Candidate Pool แล้วกด "เลือกเข้า Pool"</li>
+        <li><strong>พิจารณาใน 72 ชม.</strong>ผู้สมัครอยู่ใน Pool ของแผนก มีนาฬิกานับถอยหลัง</li>
+        <li><strong>ขอนัดสัมภาษณ์</strong>ส่งวัน เวลา รูปแบบ และผู้สัมภาษณ์ให้ HRS</li>
+        <li><strong>HRS ยืนยันนัด</strong>ได้รับแจ้งเตือนพร้อมลิงก์ หรือสถานที่สัมภาษณ์</li>
+      </ol>
+    </section>
+
+    <div class="guide-body">
+      <nav class="toc" aria-label="สารบัญ">
+        <strong>สารบัญ</strong>
+        <a href="#login"><span class="n">01</span>เข้าสู่ระบบ</a>
+        <a href="#screen"><span class="n">02</span>หน้าจอหลัก</a>
+        <a href="#pick"><span class="n">03</span>เลือกผู้สมัคร</a>
+        <a href="#hold"><span class="n">04</span>กติกา 72 ชั่วโมง</a>
+        <a href="#mine"><span class="n">05</span>Pool ของแผนก</a>
+        <a href="#filter"><span class="n">06</span>ค้นหาและตัวกรอง</a>
+        <a href="#profile"><span class="n">07</span>โปรไฟล์ผู้สมัคร</a>
+        <a href="#score"><span class="n">08</span>Candidate Score</a>
+        <a href="#interview"><span class="n">09</span>ขอนัดสัมภาษณ์</a>
+        <a href="#return"><span class="n">10</span>ส่งคืน Candidate Pool</a>
+        <a href="#compare"><span class="n">11</span>เปรียบเทียบผู้สมัคร</a>
+        <a href="#calendar"><span class="n">12</span>ปฏิทินสัมภาษณ์</a>
+        <a href="#notify"><span class="n">13</span>การแจ้งเตือน</a>
+        <a href="#rights"><span class="n">14</span>สิทธิ์ของแผนก</a>
+        <a href="#faq"><span class="n">15</span>คำถามที่พบบ่อย</a>
+      </nav>
+
+      <div>
+        <!-- 01 -->
+        <section class="g-section" id="login" aria-labelledby="h-login">
+          <span class="g-kicker">01</span>
+          <h2 id="h-login">เข้าสู่ระบบ</h2>
+          <div class="two">
+            <ol class="steps">
+              <li>เปิดเว็บ Candidate Pool</li>
+              <li>เลือก <strong>ฝ่าย</strong> แล้วเลือก <strong>แผนก</strong> ของคุณ เช่น ฝ่ายโครงการ · PJT-PD-1</li>
+              <li>ใส่ <strong>รหัสผ่านของแผนก</strong> แล้วกด "เข้าสู่ระบบ"</li>
+            </ol>
+            <div class="demo" inert>
+              <span class="demo-label">ตัวอย่างหน้าเข้าสู่ระบบ</span>
+              <div class="panel" style="gap:14px">
+                <div class="field"><label>ฝ่าย</label><select class="input"><option>ฝ่ายโครงการ</option></select></div>
+                <div class="field"><label>แผนก</label><select class="input"><option>PJT-PD-1</option></select></div>
+                <div class="field"><label>รหัสผ่านของ PJT-PD-1</label><input class="input" type="password" value="password"></div>
+                <span class="btn btn-dark btn-block">เข้าสู่ระบบ</span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><p>บัญชีและรหัสผ่านเป็นของแต่ละแผนก ลืมรหัสผ่าน หรือบัญชีถูกปิดใช้งาน ให้ติดต่อ HRS เพื่อตั้งรหัสผ่านใหม่ และอย่าส่งรหัสผ่านทางแชตหรืออีเมล</p></div>
+        </section>
+
+        <!-- 02 -->
+        <section class="g-section" id="screen" aria-labelledby="h-screen">
+          <span class="g-kicker">02</span>
+          <h2 id="h-screen">หน้าจอหลัก</h2>
+          <p class="g-lead">แถบด้านบนแสดงชื่อแผนกของคุณ กระดิ่งแจ้งเตือน และปุ่มออกจากระบบ ใต้หัวหน้ามีปุ่มสลับ 3 มุมมอง</p>
+          <div class="demo">
+            <span class="demo-label">ตัวอย่างปุ่มสลับมุมมอง</span>
+            <div class="view-switch" style="position:relative">
+              <button type="button" aria-pressed="true" tabindex="-1"><span class="dot" style="background:#5B3DF5;width:12px;height:12px" aria-hidden="true"></span>Pool ของ PJT-PD-1 <span class="count">5</span></button>
+              <button type="button" aria-pressed="false" tabindex="-1"><span class="dot" style="background:#FF7A3D;width:12px;height:12px;border-radius:12px 12px 0 0" aria-hidden="true"></span>Candidate Pool <span class="count">12</span></button>
+              <button type="button" aria-pressed="false" tabindex="-1"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg> ปฏิทิน <span class="count">2</span></button>
+            </div>
+          </div>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">มุมมอง</th><th scope="col">ใช้ทำอะไร</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Pool ของแผนก</th><td>ผู้สมัครที่อยู่กับแผนกคุณแล้ว (เลือกเองหรือ HRS ส่งมา) ใช้ขอนัดสัมภาษณ์ ติดตามสถานะ หรือส่งคืน</td></tr>
+              <tr><th scope="row">Candidate Pool</th><td>ผู้สมัครที่ HRS คัดกรองแล้วและยังไม่มีแผนกใดเลือก ใช้เลือกผู้สมัครเข้า Pool ของคุณ</td></tr>
+              <tr><th scope="row">ปฏิทิน</th><td>นัดสัมภาษณ์ของแผนกคุณ ทั้งที่รอ HRS ยืนยันและยืนยันแล้ว</td></tr>
+            </tbody>
+          </table></div>
+          <p class="g-lead">กดโลโก้ Candidate Pool มุมซ้ายบนเพื่อกลับหน้าหลักและโหลดข้อมูลล่าสุด หรือกดปุ่ม <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg> รีเฟรช ระบบโหลดข้อมูลใหม่ให้เองทุกครั้งที่กลับมาที่หน้าต่างนี้ และตรวจการแจ้งเตือนทุกนาที</p>
+        </section>
+
+        <!-- 03 -->
+        <section class="g-section" id="pick" aria-labelledby="h-pick">
+          <span class="g-kicker">03</span>
+          <h2 id="h-pick">เลือกผู้สมัครจาก Candidate Pool</h2>
+          <p class="g-lead">ในแท็บ Candidate Pool แต่ละการ์ดสรุปข้อมูลสำคัญของผู้สมัคร 1 คน กดที่ส่วนไหนของการ์ดก็ได้ (ยกเว้นปุ่ม) เพื่อเปิดโปรไฟล์เต็ม</p>
+          <div class="two">
+            <div class="demo">
+              <span class="demo-label">ตัวอย่างการ์ดใน Candidate Pool</span>
+              <span class="callout" data-for=".card-id" style="left:6px">1</span>
+              <span class="callout" data-for=".match" style="right:6px">2</span>
+              <span class="callout" data-for=".note" style="left:6px">3</span>
+              <span class="callout" data-for=".card-head .muted" style="left:6px">4</span>
+              <span class="callout" data-for=".card-bottom .btn-dark" style="right:6px">5</span>
+              <article class="card" style="gap:16px" inert>
+                <span class="new-badge new-tag">New</span>
+                <div class="card-head">
+                  <span class="avatar" aria-hidden="true" style="border-radius:999px;background:#FFD84D;color:#111">ก</span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span class="card-id">C052 · Prescreen 3 พ.ย. 69</span>
+                    <h2><span class="name-btn">กมลวรรณ ตัวอย่าง</span></h2>
+                    <span class="muted" style="font-size:15px">Site Engineer · 6 ปี · คาดหวัง ฿45,000</span>
+                    <span class="card-tags"><span class="pre-tag yes">Pre-interviewed</span></span>
+                  </div>
+                  <div class="match"><strong style="font-size:26px;color:#2B8A3E">80%</strong><span>Candidate Score</span></div>
+                </div>
+                <div class="note"><span class="note-label">ความเห็นจาก Recruit</span><p>ผู้สมัครมีประสบการณ์คุมงานโครงสร้…</p></div>
+                <div class="card-bottom" style="display:flex;gap:10px;flex-wrap:wrap">
+                  <span class="btn icon-only" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 6.5-3.5 10.5h-11L3 8.5z"/><path d="M12 7l4.5 3.3-1.7 5.2H9.2l-1.7-5.2z"/></svg></span>
+                  <span class="btn btn-dark" style="flex:1"><span style="color:#C8F169;display:flex"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>เลือกเข้า Pool ของ PJT-PD-1</span>
+                </div>
+              </article>
+            </div>
+            <ul class="legend-list">
+              <li><span class="callout">1</span><span><strong>Candidate ID · วันที่ Prescreen</strong> ชื่อ ตำแหน่ง ประสบการณ์ และป้าย <span class="pre-tag yes">Pre-interviewed</span> เมื่อ HRS สัมภาษณ์เบื้องต้นแล้ว ป้าย <span class="new-badge">New</span> คือผู้สมัครที่เข้าระบบภายใน 3 วัน</span></li>
+              <li><span class="callout">2</span><span><strong>Candidate Score</strong> คะแนนรวมเป็น % จากคะแนน 7 มิติ สีเขียว = สูง ดูวิธีคิดได้ที่ <a href="#score">หัวข้อ 08</a></span></li>
+              <li><span class="callout">3</span><span><strong>ความเห็นจาก Recruit</strong> แสดง 30 ตัวอักษรแรก ข้อความเต็มอยู่ในโปรไฟล์</span></li>
+              <li><span class="callout">4</span><span><strong>เงินเดือนคาดหวัง</strong> แสดงต่อท้ายตำแหน่งเฉพาะผู้สมัครที่ HRS เปิดให้แผนกเห็น</span></li>
+              <li><span class="callout">5</span><span><strong>เลือกเข้า Pool</strong> ผู้สมัครย้ายไปอยู่ใน Pool ของแผนกคุณทันที และเริ่มนับเวลา 72 ชม. ปุ่ม <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 2l9 6.5-3.5 10.5h-11L3 8.5z"/><path d="M12 7l4.5 3.3-1.7 5.2H9.2l-1.7-5.2z"/></svg> ด้านซ้ายใช้เปรียบเทียบกับผู้สมัครคนอื่น</span></li>
+            </ul>
+          </div>
+          <div class="info-box"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><p>กดเลือกผิดคน? หลังเลือกจะมีแถบข้อความด้านล่างพร้อมปุ่ม <strong>เลิกทำ</strong> กดเพื่อคืนผู้สมัครกลับ Candidate Pool ได้ทันที ผู้สมัคร 1 คนอยู่ได้ทีละ 1 แผนก เมื่อแผนกหนึ่งเลือกแล้ว แผนกอื่นจะไม่เห็นในหน้า Candidate Pool</p></div>
+        </section>
+
+        <!-- 04 -->
+        <section class="g-section" id="hold" aria-labelledby="h-hold">
+          <span class="g-kicker">04</span>
+          <h2 id="h-hold">กติกา 72 ชั่วโมง</h2>
+          <p class="g-lead">ผู้สมัครที่แผนกเลือกเองจาก Candidate Pool มีเวลาพิจารณา 72 ชั่วโมง เพื่อไม่ให้ผู้สมัครค้างอยู่ที่แผนกใดแผนกหนึ่งนานเกินไป และแผนกอื่นได้มีโอกาสพิจารณา</p>
+          <div class="rules">
+            <div class="rule" style="background:var(--sun)"><span class="big">72</span><strong>ชั่วโมงเริ่มนับทันที</strong>นับจากเวลาที่กด "เลือกเข้า Pool" การ์ดแสดงนาฬิกานับถอยหลังทุกวินาที</div>
+            <div class="rule" style="background:#FDECEA;color:#8A1C12"><span class="big">12</span><strong>ชั่วโมงสุดท้ายเป็นสีแดง</strong>เตือนว่าใกล้หมดเวลา ควรขอนัดหรือส่งคืน</div>
+            <div class="rule" style="background:var(--violet);color:#fff"><span class="big">⏸</span><strong>ขอนัดสัมภาษณ์ = หยุดนาฬิกา</strong>เมื่อส่งคำขอนัดแล้ว การนับเวลาหยุดถาวร</div>
+            <div class="rule" style="background:#fff"><span class="big">↩</span><strong>หมดเวลา = กลับ Candidate Pool</strong>ระบบคืนผู้สมัครให้อัตโนมัติ และส่งการแจ้งเตือน "หมดเวลาพิจารณา"</div>
+          </div>
+          <div class="demo" style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+            <span class="demo-label">ตัวอย่างนาฬิกานับถอยหลังบนการ์ด</span>
+            <div class="hold" inert><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><strong class="mono">47:12:05</strong></div>
+            <span class="muted" style="font-size:14px">ยังมีเวลา</span>
+            <div class="hold urgent" inert><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><strong class="mono">05:40:18</strong></div>
+            <span class="muted" style="font-size:14px">เหลือไม่ถึง 12 ชม.</span>
+          </div>
+          <p class="g-lead">ผู้สมัครที่ HRS ส่งเข้า Pool ของแผนกโดยตรงจะไม่มีการนับเวลานี้</p>
+        </section>
+
+        <!-- 05 -->
+        <section class="g-section" id="mine" aria-labelledby="h-mine">
+          <span class="g-kicker">05</span>
+          <h2 id="h-mine">Pool ของแผนก</h2>
+          <p class="g-lead">หน้านี้คือพื้นที่ทำงานหลัก ด้านบนมีตัวเลขสรุปสถานะ 4 ช่อง ใต้ลงมาเป็นปุ่มกรองตามสถานะ และการ์ดผู้สมัครแยกกลุ่มตามตำแหน่ง</p>
+          <div class="demo">
+            <span class="demo-label">ตัวอย่างตัวเลขสรุป</span>
+            <section class="kpis" inert>
+              <div class="kpi" style="background:#FFD84D;color:#111"><span class="kpi-label">รอพิจารณา</span><span class="kpi-value">2</span><span class="kpi-deco" aria-hidden="true" style="border-radius:999px;background:#fff"></span></div>
+              <div class="kpi" style="background:#FF7A3D;color:#111"><span class="kpi-label">รอ HRS ยืนยันนัด</span><span class="kpi-value">1</span><span class="kpi-deco" aria-hidden="true" style="border-radius:88px 0 0 0;background:#FFB3D1"></span></div>
+              <div class="kpi" style="background:#5B3DF5;color:#fff"><span class="kpi-label">นัดสัมภาษณ์แล้ว</span><span class="kpi-value">1</span><span class="kpi-deco" aria-hidden="true" style="border-radius:999px;background:#C8F169"></span></div>
+              <div class="kpi" style="background:#8EC5FF;color:#111"><span class="kpi-label">ทั้งหมดใน Pool</span><span class="kpi-value">5</span><span class="kpi-deco" aria-hidden="true" style="border-radius:0 88px 0 0;background:#111"></span></div>
+            </section>
+          </div>
+          <h3>สถานะของผู้สมัคร</h3>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">สถานะ</th><th scope="col">ความหมาย</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><span class="pill" style="background:#FFF1C2;color:#5C4300">รอพิจารณา</span></th><td>เพิ่งเข้า Pool ของแผนก ยังไม่ได้ขอนัด (ถ้าเลือกเอง จะมีนาฬิกา 72 ชม.)</td></tr>
+              <tr><th scope="row"><span class="pill" style="background:#E8FBC4;color:#2E4A00">เรียกสัมภาษณ์</span></th><td>แผนกส่งคำขอนัดแล้ว รอ HRS ยืนยัน</td></tr>
+              <tr><th scope="row"><span class="pill" style="background:#5B3DF5;color:#fff">นัดสัมภาษณ์แล้ว</span></th><td>HRS ยืนยันนัดแล้ว มีวันเวลาและลิงก์หรือสถานที่</td></tr>
+              <tr><th scope="row"><span class="pill" style="background:#DCE8FF;color:#1D3A7A">สำรอง</span> <span class="pill" style="background:#ECEBE7;color:#3D3C38">ไม่พิจารณา</span></th><td>HRS เป็นผู้กำหนด ปุ่มกรองของ 2 สถานะนี้แสดงเมื่อมีผู้สมัครในสถานะนั้น</td></tr>
+            </tbody>
+          </table></div>
+          <h3>การ์ดใน Pool ของแผนก</h3>
+          <div class="two">
+            <div class="demo">
+              <span class="demo-label">ตัวอย่างการ์ดที่ขอนัดแล้ว</span>
+              <article class="card" inert>
+                <div class="card-head">
+                  <span class="avatar" aria-hidden="true" style="border-radius:0 26px 0 26px;background:#8EC5FF;color:#111">ธ</span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span class="card-id">C041 · Prescreen 28 ต.ค. 69</span>
+                    <h2><span class="name-btn">ธนพล ตัวอย่าง</span></h2>
+                    <span class="muted" style="font-size:15px">QS Engineer · 4 ปี · อายุ 29</span>
+                  </div>
+                  <div class="match"><strong style="color:#B26B00">63%</strong><span>Candidate Score</span></div>
+                </div>
+                <div class="bar" aria-hidden="true"><div style="width:63%;background:#FFB020"></div></div>
+                <dl class="facts">
+                  <div><dt>บริษัทล่าสุด</dt><dd>บริษัท ตัวอย่าง จำกัด</dd></div>
+                  <div><dt>การศึกษา</dt><dd>ปริญญาตรี สาขาวิศวกรรมโยธา</dd></div>
+                </dl>
+                <div class="interview-box requested">
+                  <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:15px">รอ HRS ยืนยันนัด</strong><span>12 พ.ย. 69 10:00 · Online · ผู้สัมภาษณ์ 2 คน</span></span>
+                  <span class="btn btn-sm">แก้ไขคำขอ</span>
+                </div>
+                <div class="card-actions">
+                  <span class="btn" style="margin-left:auto">ตัวเลือก</span>
+                </div>
+              </article>
+            </div>
+            <ul class="legend-list">
+              <li><span class="callout">●</span><span><strong>นัดสัมภาษณ์</strong> ปุ่มดำบนการ์ดของผู้สมัครที่ยังไม่มีนัด กดเพื่อส่งคำขอนัด (<a href="#interview">หัวข้อ 09</a>)</span></li>
+              <li><span class="callout">●</span><span><strong>กล่องนัดหมาย</strong> สีส้มเส้นประ = รอ HRS ยืนยัน กด "แก้ไขคำขอ" ได้ / สีม่วง = ยืนยันแล้ว มีลิงก์เข้าห้อง Online หรือสถานที่ กด "รายละเอียด" เพื่อดูทั้งหมด</span></li>
+              <li><span class="callout">⋯</span><span><strong>ปุ่ม ⋯ / ตัวเลือก</strong> รวมคำสั่งที่ใช้ไม่บ่อย: <strong>เปรียบเทียบกับคนอื่น</strong>, <strong>เปิด CV</strong> (เมื่อ HRS แนบลิงก์ไว้) และ <strong>ส่งคืน Candidate Pool</strong></span></li>
+              <li><span class="callout">●</span><span>มุมล่างของการ์ดบอกว่าผู้สมัครมาจากไหน: "คุณเลือกจาก Candidate Pool" หรือ "HRS ส่งเข้า Pool นี้"</span></li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 06 -->
+        <section class="g-section" id="filter" aria-labelledby="h-filter">
+          <span class="g-kicker">06</span>
+          <h2 id="h-filter">ค้นหาและตัวกรอง</h2>
+          <p class="g-lead">ใช้ได้ทั้งในแท็บ Pool ของแผนก และ Candidate Pool ตัวกรองใช้ร่วมกันได้หลายตัวพร้อมกัน</p>
+          <div class="demo">
+            <span class="demo-label">ตัวอย่างปุ่มกรองตามสถานะ</span>
+            <div class="chip-row" inert>
+              <span class="chip" aria-pressed="true">ทั้งหมด · 5</span><span class="chip" aria-pressed="false">รอพิจารณา · 2</span><span class="chip" aria-pressed="false">เรียกสัมภาษณ์ · 1</span><span class="chip" aria-pressed="false">นัดสัมภาษณ์แล้ว · 1</span>
+            </div>
+          </div>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">เครื่องมือ</th><th scope="col">วิธีใช้</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">ช่องค้นหา</th><td>พิมพ์ชื่อ Candidate ID หรือตำแหน่ง ผลลัพธ์กรองทันทีขณะพิมพ์</td></tr>
+              <tr><th scope="row">ปุ่มสถานะ</th><td>เฉพาะ Pool ของแผนก กดเพื่อดูเฉพาะสถานะนั้น ตัวเลขบอกจำนวนคน</td></tr>
+              <tr><th scope="row">ตำแหน่ง</th><td>เลือกดูเฉพาะตำแหน่งเดียว</td></tr>
+              <tr><th scope="row">ช่วงวันที่ Prescreen</th><td>7 / 30 / 90 วันล่าสุด หรือ "กำหนดเอง" เพื่อเลือกวันเริ่มและวันสิ้นสุด</td></tr>
+              <tr><th scope="row">จัดกลุ่มตามตำแหน่ง</th><td>เปิด = แยกการ์ดเป็นกลุ่มตามตำแหน่ง พร้อมจำนวนคน / ปิด = เรียงรวมกัน</td></tr>
+              <tr><th scope="row">ล้างตัวกรอง</th><td>ปรากฏเมื่อมีตัวกรองเปิดอยู่ กดเพื่อกลับเป็นค่าเริ่มต้นทั้งหมด</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <!-- 07 -->
+        <section class="g-section" id="profile" aria-labelledby="h-profile">
+          <span class="g-kicker">07</span>
+          <h2 id="h-profile">โปรไฟล์ผู้สมัคร</h2>
+          <p class="g-lead">กดชื่อหรือพื้นที่ว่างบนการ์ดเพื่อเปิดหน้าต่างโปรไฟล์ ซึ่งรวมข้อมูลทั้งหมดที่แผนกเห็นได้ และปุ่มคำสั่งที่เหมาะกับสถานะของผู้สมัครคนนั้น</p>
+          <div class="two">
+            <div class="panel">
+              <h3>ข้อมูลที่แสดง</h3>
+              <ul class="legend-list">
+                <li>• ชื่อ Candidate ID ตำแหน่ง อายุ ประสบการณ์รวม การศึกษา บริษัทล่าสุด วันที่ Prescreen</li>
+                <li>• Candidate Score และคะแนนรายมิติทั้ง 7 มิติ</li>
+                <li>• ความเห็นจาก Recruit ฉบับเต็ม และ HR Recommendation (ถ้ามี)</li>
+                <li>• เงินเดือนปัจจุบันและคาดหวัง เฉพาะรายที่ HRS เปิดให้เห็น</li>
+                <li>• ข้อมูลนัดสัมภาษณ์ (เมื่อมีนัด) และข้อความจาก HRS</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>ปุ่มในโปรไฟล์</h3>
+              <ul class="legend-list">
+                <li>• อยู่ใน Candidate Pool: <strong>เทียบ</strong>, <strong>เลือกเข้า Pool</strong></li>
+                <li>• อยู่ใน Pool ของแผนก ยังไม่มีนัด: <strong>เทียบ</strong>, <strong>ส่งคืน Candidate Pool</strong>, <strong>นัดสัมภาษณ์</strong></li>
+                <li>• รอ HRS ยืนยัน: <strong>แก้ไขคำขอนัด</strong></li>
+                <li>• ยืนยันนัดแล้ว: <strong>ดูนัด / ขอเปลี่ยนนัด</strong></li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-box"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><p>อีเมลและเบอร์โทรศัพท์ของผู้สมัครเห็นเฉพาะ HRS การติดต่อผู้สมัครทำผ่าน HRS เมื่อยืนยันนัดแล้ว</p></div>
+        </section>
+
+        <!-- 08 -->
+        <section class="g-section" id="score" aria-labelledby="h-score">
+          <span class="g-kicker">08</span>
+          <h2 id="h-score">Candidate Score และคะแนน 7 มิติ</h2>
+          <p class="g-lead">HRS ให้คะแนนผู้สมัครแต่ละมิติเต็ม 5 จากการประเมิน Resume แล้วระบบรวมเป็น % ดังนี้</p>
+          <div class="panel" style="align-items:flex-start">
+            <p style="font-size:20px;font-weight:700">Candidate Score = ผลรวมคะแนน ÷ (5 × จำนวนมิติที่ให้คะแนน)</p>
+            <p class="muted">ตัวอย่าง: ให้คะแนนครบ 7 มิติ รวม 28 คะแนน → 28 ÷ 35 = <strong style="color:#2B8A3E">80%</strong> · ถ้า HRS ให้คะแนนแค่บางมิติ ระบบคิดจากเฉพาะมิติที่มีคะแนน</p>
+          </div>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">มิติ</th><th scope="col">ดูจากอะไรใน Resume</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">ประสบการณ์</th><td>บริษัท ประเภทธุรกิจ ตำแหน่ง ระยะเวลา ขนาดงาน และขอบเขตความรับผิดชอบ</td></tr>
+              <tr><th scope="row">ความรู้และทักษะ</th><td>ความรู้เฉพาะทาง โปรแกรม เครื่องมือ ระบบ ภาษา และตัวอย่างการใช้งานจริง</td></tr>
+              <tr><th scope="row">ผลงาน</th><td>โครงการ รางวัล บทบาทที่ลงมือทำ และผลลัพธ์ที่เป็นตัวเลขหรือคุณภาพ</td></tr>
+              <tr><th scope="row">เส้นทางอาชีพ</th><td>ลำดับงาน การเลื่อนตำแหน่ง ระยะเวลา และความต่อเนื่อง</td></tr>
+              <tr><th scope="row">การเรียนรู้</th><td>วุฒิการศึกษาสูงสุด และการอบรมพัฒนาตนเอง</td></tr>
+              <tr><th scope="row">ความน่าเชื่อถือ</th><td>ความครบ ชัดเจน และสอดคล้องของข้อมูลใน Resume</td></tr>
+              <tr><th scope="row">Tech &amp; AI</th><td>การนำเทคโนโลยี Automation หรือ AI มาใช้ปรับปรุงงาน</td></tr>
+            </tbody>
+          </table></div>
+          <p class="score-note" role="note"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><span>คะแนนในแต่ละมิติมาจากการประเมิน Resume ของผู้สมัคร อาจจะไม่ได้สะท้อนคุณภาพจริงได้อย่างชัดเจน ใช้ประกอบการตัดสินใจร่วมกับการสัมภาษณ์</span></p>
+        </section>
+
+        <!-- 09 -->
+        <section class="g-section" id="interview" aria-labelledby="h-interview">
+          <span class="g-kicker">09</span>
+          <h2 id="h-interview">ขอนัดสัมภาษณ์</h2>
+          <p class="g-lead">แผนกส่ง "คำขอนัด" ถึง HRS แล้ว HRS เป็นผู้ติดต่อผู้สมัครและยืนยันนัดให้ ทำได้เฉพาะผู้สมัครใน Pool ของแผนกคุณ</p>
+          <ol class="steps">
+            <li>กดปุ่ม <strong>นัดสัมภาษณ์</strong> บนการ์ด หรือในโปรไฟล์ผู้สมัคร</li>
+            <li>เลือก <strong>วันและเวลาสัมภาษณ์</strong> ระบบไม่รับวันหรือเวลาที่ผ่านไปแล้ว และจะขึ้นข้อความเตือนทันที</li>
+            <li>เลือก <strong>รูปแบบ</strong>: <strong>Online</strong> (HRS จะสร้างลิงก์ให้หลังยืนยัน) หรือ <strong>Onsite</strong> (ระบุสถานที่ เช่น ห้องประชุม 3 อาคาร A)</li>
+            <li>ใส่ <strong>ผู้สัมภาษณ์</strong>: ชื่อ-สกุล ตำแหน่ง และฝ่าย กด "เพิ่มผู้สัมภาษณ์" ได้สูงสุด 8 คน</li>
+            <li>กด <strong>ส่งคำขอถึง HRS</strong> สถานะเปลี่ยนเป็น "เรียกสัมภาษณ์" และนาฬิกา 72 ชม. หยุดทันที</li>
+          </ol>
+          <div class="demo" style="display:flex;flex-direction:column;gap:12px">
+            <span class="demo-label">สถานะนัดบนการ์ด</span>
+            <div class="interview-box requested" inert>
+              <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:15px">รอ HRS ยืนยันนัด</strong><span>12 พ.ย. 69 10:00 · Onsite · ผู้สัมภาษณ์ 2 คน</span></span>
+              <span class="btn btn-sm">แก้ไขคำขอ</span>
+            </div>
+            <div class="interview-box confirmed" inert>
+              <span style="display:flex;flex-direction:column;gap:4px;min-width:0"><strong style="font-size:15px">ยืนยันนัดแล้ว · 12 พ.ย. 69 10:00</strong><span>🎥 <u>เข้าห้องสัมภาษณ์ Online</u></span></span>
+              <span class="btn btn-sm">รายละเอียด</span>
+            </div>
+          </div>
+          <div class="two">
+            <div class="panel"><h3>แก้ไขก่อน HRS ยืนยัน</h3><p class="muted" style="line-height:1.7">กด <strong>แก้ไขคำขอ</strong> บนการ์ด แก้วัน เวลา รูปแบบ หรือผู้สัมภาษณ์ แล้วส่งใหม่</p></div>
+            <div class="panel"><h3>เปลี่ยนนัดหลังยืนยันแล้ว</h3><p class="muted" style="line-height:1.7">กด <strong>รายละเอียด</strong> แล้วเลือก <strong>ขอเปลี่ยนนัด</strong> ระบบส่งคำขอใหม่ให้ HRS ยืนยันอีกครั้ง</p></div>
+          </div>
+        </section>
+
+        <!-- 10 -->
+        <section class="g-section" id="return" aria-labelledby="h-return">
+          <span class="g-kicker">10</span>
+          <h2 id="h-return">ส่งคืน Candidate Pool</h2>
+          <p class="g-lead">เมื่อผู้สมัครไม่ตรงกับความต้องการ ให้ส่งคืนเพื่อให้แผนกอื่นพิจารณาต่อ</p>
+          <ol class="steps">
+            <li>กด <strong>⋯</strong> บนการ์ด (หรือเปิดโปรไฟล์) แล้วเลือก <strong>ส่งคืน Candidate Pool</strong></li>
+            <li>ยืนยันในหน้าต่างที่ขึ้นมา ผู้สมัครออกจาก Pool ของคุณ และกลับไปให้ทุกแผนกเห็น</li>
+          </ol>
+          <div class="info-box" style="background:#FFF1E8;color:#5E2400"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><p>ถ้าผู้สมัครมีนัดสัมภาษณ์อยู่ นัดนั้นจะถูกยกเลิก และ HRS จะได้รับการแจ้งเตือน ส่วนการย้ายผู้สมัครไปแผนกอื่นโดยตรง ต้องให้ HRS เป็นผู้ย้าย</p></div>
+        </section>
+
+        <!-- 11 -->
+        <section class="g-section" id="compare" aria-labelledby="h-compare">
+          <span class="g-kicker">11</span>
+          <h2 id="h-compare">เปรียบเทียบผู้สมัคร</h2>
+          <p class="g-lead">เทียบผู้สมัครได้สูงสุด 4 คนพร้อมกัน ทั้งคนใน Pool ของแผนกและใน Candidate Pool</p>
+          <ol class="steps">
+            <li>กด <strong>เปรียบเทียบผู้สมัคร</strong> ที่หัวหน้า หรือปุ่ม <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 2l9 6.5-3.5 10.5h-11L3 8.5z"/><path d="M12 7l4.5 3.3-1.7 5.2H9.2l-1.7-5.2z"/></svg> / "เปรียบเทียบกับคนอื่น" ของผู้สมัครคนใดคนหนึ่ง (คนนั้นจะถูกเลือกไว้ให้แล้ว)</li>
+            <li>เลือกประเภทตำแหน่ง หรือค้นหาชื่อ แล้วติ๊กผู้สมัครที่ต้องการเทียบ</li>
+            <li>ดู <strong>กราฟใยแมงมุม</strong> 7 มิติ และ <strong>ตาราง</strong> คะแนนรายมิติ ตัวเลขสีเขียวคือคะแนนสูงสุดของมิตินั้น ชี้ที่ชื่อมิติเพื่อดูคำอธิบาย</li>
+          </ol>
+          <p class="g-lead">เงินเดือนจะแสดงในการเปรียบเทียบเฉพาะผู้สมัครที่ HRS เปิดให้แผนกเห็น ส่วน — ในตารางหมายถึงมิติที่ HRS ยังไม่ได้ให้คะแนน</p>
+        </section>
+
+        <!-- 12 -->
+        <section class="g-section" id="calendar" aria-labelledby="h-calendar">
+          <span class="g-kicker">12</span>
+          <h2 id="h-calendar">ปฏิทินสัมภาษณ์</h2>
+          <p class="g-lead">แท็บ <strong>ปฏิทิน</strong> แสดงนัดของแผนกคุณเป็นรายเดือน ทั้งที่รอยืนยัน (สีส้ม) และยืนยันแล้ว (สีม่วง)</p>
+          <ul class="legend-list">
+            <li>• ใช้ปุ่ม <strong>‹ ›</strong> เปลี่ยนเดือน และ <strong>เดือนนี้</strong> เพื่อกลับเดือนปัจจุบัน</li>
+            <li>• กดที่นัดในปฏิทินเพื่อเปิดรายละเอียด วัน เวลา รูปแบบ ลิงก์หรือสถานที่ และรายชื่อผู้สัมภาษณ์</li>
+            <li>• จากรายละเอียดนัด กด <strong>แก้ไขคำขอ</strong> หรือ <strong>ขอเปลี่ยนนัด</strong> ได้</li>
+          </ul>
+        </section>
+
+        <!-- 13 -->
+        <section class="g-section" id="notify" aria-labelledby="h-notify">
+          <span class="g-kicker">13</span>
+          <h2 id="h-notify">การแจ้งเตือน</h2>
+          <p class="g-lead">กระดิ่งมุมขวาบนแสดงตัวเลขสีแดงเมื่อมีการแจ้งเตือนใหม่ กดเพื่อเปิดรายการ ระบบนับว่าอ่านแล้วเมื่อเปิดดู</p>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">ประเภท</th><th scope="col">เกิดขึ้นเมื่อ</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><span class="pill" style="background:#EFEAFF;color:#3B23C9">ยืนยันนัด</span></th><td>HRS ยืนยันนัดแล้ว พร้อมวัน เวลา ลิงก์ หรือสถานที่ กด "ดูนัดหมาย" เพื่อเปิดรายละเอียด</td></tr>
+              <tr><th scope="row"><span class="pill" style="background:#FDECEA;color:#8A1C12">หมดเวลาพิจารณา</span></th><td>ครบ 72 ชม. โดยยังไม่ได้ขอนัด ผู้สมัครกลับ Candidate Pool แล้ว</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <!-- 14 -->
+        <section class="g-section" id="rights" aria-labelledby="h-rights">
+          <span class="g-kicker">14</span>
+          <h2 id="h-rights">สิ่งที่บัญชีแผนกทำได้</h2>
+          <div class="tw"><table class="g-table">
+            <thead><tr><th scope="col">การทำงาน</th><th scope="col">บัญชีแผนก</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">ดูผู้สมัคร</th><td><span class="ok">ได้</span> · Candidate Pool และ Pool ของแผนกตนเอง</td></tr>
+              <tr><th scope="row">เลือกผู้สมัครเข้า Pool</th><td><span class="ok">ได้</span> · เฉพาะ Pool ของตนเอง พิจารณาภายใน 72 ชม.</td></tr>
+              <tr><th scope="row">ส่งคืน Candidate Pool</th><td><span class="ok">ได้</span> · เฉพาะผู้สมัครใน Pool ของตนเอง</td></tr>
+              <tr><th scope="row">ขอนัดสัมภาษณ์</th><td><span class="ok">ได้</span> · ส่งคำขอ HRS เป็นผู้ยืนยัน</td></tr>
+              <tr><th scope="row">ปฏิทินสัมภาษณ์ / เปรียบเทียบ</th><td><span class="ok">ได้</span> · เฉพาะข้อมูลที่แผนกเห็น</td></tr>
+              <tr><th scope="row">ดูเงินเดือน</th><td>เฉพาะรายที่ HRS เปิดให้เห็น (เริ่มต้น: ไม่เห็น)</td></tr>
+              <tr><th scope="row">ดูอีเมล / เบอร์โทรผู้สมัคร</th><td><span class="no">ไม่ได้</span> · เห็นเฉพาะ HRS</td></tr>
+              <tr><th scope="row">ย้ายผู้สมัครไปแผนกอื่น</th><td><span class="no">ไม่ได้</span> · แจ้ง HRS</td></tr>
+              <tr><th scope="row">กำหนด Executive Decision</th><td><span class="no">ไม่ได้</span> · สถานะเปลี่ยนตามการขอนัด / HRS เป็นผู้กำหนด</td></tr>
+              <tr><th scope="row">เพิ่ม / แก้ไขข้อมูลผู้สมัคร</th><td><span class="no">ไม่ได้</span> · แจ้ง HRS เมื่อพบข้อมูลไม่ถูกต้อง</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <!-- 15 -->
+        <section class="g-section faq" id="faq" aria-labelledby="h-faq">
+          <span class="g-kicker">15</span>
+          <h2 id="h-faq">คำถามที่พบบ่อย</h2>
+          <div>
+            <details><summary>ผู้สมัครหายไปจาก Pool ของแผนก</summary><p>อาจครบ 72 ชม. โดยยังไม่ได้ขอนัด (ดูการแจ้งเตือน "หมดเวลาพิจารณา") หรือ HRS ย้ายผู้สมัครไปที่อื่น ซึ่งกรณีนี้ไม่มีการแจ้งเตือนถึงแผนก ถ้ายังสนใจ ดูในแท็บ Candidate Pool ว่ายังว่างอยู่หรือไม่</p></details>
+            <details><summary>ทำไมไม่เห็นเงินเดือนของผู้สมัคร</summary><p>เงินเดือนซ่อนเป็นค่าเริ่มต้น HRS เปิดให้แผนกเห็นเป็นรายคน หากจำเป็นต้องใช้ประกอบการพิจารณา ให้ติดต่อ HRS</p></details>
+            <details><summary>หน้าเว็บไม่อัปเดต หรือหน้าตาไม่เหมือนในคู่มือ</summary><p>กด <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (Mac: <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>) เพื่อโหลดหน้าใหม่ทั้งหมด เบราว์เซอร์อาจเก็บไฟล์เก่าไว้ได้นานประมาณ 10 นาทีหลังระบบอัปเดต</p></details>
+            <details><summary>เลือกวันเวลานัดไม่ได้</summary><p>ระบบไม่รับวันหรือเวลาที่ผ่านไปแล้ว ตรวจวันที่และเวลา (รูปแบบ 24 ชั่วโมง) อีกครั้ง</p></details>
+            <details><summary>ยังไม่ได้ลิงก์สัมภาษณ์ Online</summary><p>ลิงก์จะมาพร้อมการแจ้งเตือน "ยืนยันนัด" หลัง HRS ยืนยัน ระหว่างนั้นสถานะคือ "รอ HRS ยืนยันนัด"</p></details>
+            <details><summary>ลืมรหัสผ่าน หรือเข้าสู่ระบบไม่ได้</summary><p>ติดต่อ HRS เพื่อตรวจสอบบัญชีและตั้งรหัสผ่านใหม่ ห้ามส่งรหัสผ่านทางแชตหรืออีเมล</p></details>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Opened as a file (not from the website)? Send the buttons to the live site instead of a folder.
+    if (location.protocol === 'file:') {
+      document.querySelectorAll('[data-app]').forEach((a) => { a.href = 'https://nuvela-labs.github.io/Candidate-Pool/#/signin'; });
+    }
+    // Numbered callouts sit level with the part of the sample card they describe, at any width.
+    function placeCallouts() {
+      document.querySelectorAll('.demo .callout[data-for]').forEach((c) => {
+        const demo = c.closest('.demo'), t = demo.querySelector(c.dataset.for);
+        if (!t) return;
+        const d = demo.getBoundingClientRect(), r = t.getBoundingClientRect();
+        c.style.top = Math.round(r.top - d.top + r.height / 2 - 13) + 'px';
+      });
+    }
+    placeCallouts();
+    addEventListener('resize', placeCallouts);
+    document.fonts && document.fonts.ready.then(placeCallouts);
+    // Highlight the table-of-contents entry for the section on screen.
+    const links = [...document.querySelectorAll('.toc a')];
+    const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        links.forEach((a) => a.removeAttribute('aria-current'));
+        const a = byId.get(e.target.id);
+        if (a) a.setAttribute('aria-current', 'true');
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.g-section').forEach((s) => io.observe(s));
+  </script>
+</body>
+</html>

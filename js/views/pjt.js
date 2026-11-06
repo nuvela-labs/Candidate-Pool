@@ -194,6 +194,7 @@ export function mountPjt(root, { store, session, signOut, onCleanup }) {
         <span class="unit-badge">${esc(unitFullLabel(unit))}</span>
       </div>
       <div class="account-bar" style="margin:0">
+        <a class="btn btn-sm btn-ghost" href="guide.html" target="_blank" rel="noopener" title="คู่มือการใช้งานสำหรับแผนก (เปิดแท็บใหม่)">${ICONS.doc} คู่มือ</a>
         ${bellHTML(st.notifs)}
         <span class="account-name"><span class="avatar-sm" aria-hidden="true">${esc((session.username || 'U').charAt(0).toUpperCase())}</span>${esc(session.username)}</span>
         <button type="button" class="btn btn-sm btn-ghost" data-signout title="ออกจากระบบ">${ICONS.logout} ออกจากระบบ</button>
