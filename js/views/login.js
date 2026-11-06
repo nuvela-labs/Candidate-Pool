@@ -97,7 +97,7 @@ export function mountLogin(root, { store, go }) {
         </section>
       </main>
       <footer class="login-foot">
-        <a class="btn btn-sm" href="guide.html" target="_blank" rel="noopener" title="เปิดคู่มือในแท็บใหม่">${ICONS.doc} คู่มือการใช้งานสำหรับแผนก</a>
+        <a class="btn btn-sm" href="guide.html" target="_blank" rel="noopener" title="เปิดคู่มือในแท็บใหม่">${ICONS.doc} คู่มือการใช้งาน</a>
       </footer>
     </div>`;
 
