@@ -1,6 +1,6 @@
 // Business rules shared by both stores. The Supabase store enforces the same
 // rules again on the server (supabase/*.sql); these keep demo mode honest.
-import { POOL, DECISIONS, HRS } from '../ui.js';
+import { POOL, DECISIONS, KEEPS_INTERVIEW, OTHER, HRS } from '../ui.js';
 import { CONFIG } from '../config.js';
 
 export const CLEARED_INTERVIEW = {
@@ -60,6 +60,7 @@ export function pjtDecide(c, unit, decision) {
   if (c.location !== unit) throw new Error(`${c.id} ไม่ได้อยู่ใน Pool ของ ${unit}`);
   assertDecision(decision);
   if (decision === 'นัดสัมภาษณ์แล้ว') throw new Error(`สถานะนี้ตั้งได้เมื่อ ${HRS} ยืนยันนัดเท่านั้น`);
+  if (decision === OTHER) throw new Error(`สถานะนี้ตั้งได้โดย ${HRS} เท่านั้น`);
   return {
     ...c, ...(decision === 'เรียกสัมภาษณ์' ? {} : CLEARED_INTERVIEW), decision,
     holdUntil: decision === 'รอพิจารณา' ? c.holdUntil : null
@@ -105,10 +106,18 @@ export function adminMove(c, location) {
     assignedBy: location === POOL ? null : 'HR'
   };
 }
-export function adminDecide(c, decision) {
+// "อื่นๆ" needs the text HRS typed (1–60 characters); any other status drops that text.
+export function decisionNote(decision, note) {
+  if (decision !== OTHER) return null;
+  const t = String(note || '').trim();
+  if (!t) throw new Error('กรุณาพิมพ์สถานะ');
+  if (t.length > 60) throw new Error('สถานะยาวได้ไม่เกิน 60 ตัวอักษร');
+  return t;
+}
+export function adminDecide(c, decision, note) {
   assertDecision(decision);
-  const keep = decision === 'เรียกสัมภาษณ์' || decision === 'นัดสัมภาษณ์แล้ว';
-  return { ...c, ...(keep ? {} : CLEARED_INTERVIEW), decision, holdUntil: decision === 'รอพิจารณา' ? c.holdUntil : null };
+  const keep = KEEPS_INTERVIEW.includes(decision);
+  return { ...c, ...(keep ? {} : CLEARED_INTERVIEW), decision, decisionNote: decisionNote(decision, note), holdUntil: decision === 'รอพิจารณา' ? c.holdUntil : null };
 }
 
 // Notification text, shared so demo and server read the same.

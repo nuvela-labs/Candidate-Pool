@@ -219,7 +219,7 @@ select.input { padding-right: 8px; }
 .decide button { min-height: 44px; border: 0; border-radius: 14px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; }
 .decide button[aria-pressed="true"][data-value="เรียกสัมภาษณ์"] { background: var(--lime); color: var(--ink); }
 .decide button[aria-pressed="true"][data-value="สำรอง"] { background: var(--sky); color: var(--ink); }
-.decide button[aria-pressed="true"][data-value="ไม่พิจารณา"] { background: var(--ink); color: #fff; }
+.decide button[aria-pressed="true"][data-value="ไม่ผ่านการพิจารณา"] { background: var(--ink); color: #fff; }
 .scheduled { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 12px 12px 18px; border-radius: var(--radius-md); background: var(--violet); color: #fff; font-size: 14px; }
 .scheduled .btn { background: #fff; border-color: #fff; }
 .card-foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #EFEDE7; }

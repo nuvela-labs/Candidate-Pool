@@ -189,10 +189,10 @@ export const demoStore = {
     save();
     return next;
   },
-  async setDecision(id, decision) {
+  async setDecision(id, decision, note) {
     const s = requireSession();
     const c = find(id);
-    if (s.role === 'admin') return put(rules.adminDecide(c, decision));
+    if (s.role === 'admin') return put(rules.adminDecide(c, decision, note));
     const next = put(rules.pjtDecide(c, s.unit, decision));
     if (c.interviewStatus && !next.interviewStatus) {
       notify('HRS', 'interview_cancelled', c, `${s.unit} ยกเลิกนัดสัมภาษณ์ ${c.id} ${c.name}`, `เปลี่ยนสถานะเป็น "${decision}"`);

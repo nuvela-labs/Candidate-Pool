@@ -13,10 +13,10 @@ import { openCompare } from '../compare.js';
 import { bellHTML, openNotifications, watchNotifications } from '../notify.js';
 import { openProfile } from '../profile.js';
 
-// Units only request interviews or send candidates back; สำรอง / ไม่พิจารณา set by
+// Units only request interviews or send candidates back; ผ่านการพิจารณา / สำรอง / ไม่ผ่านการพิจารณา / อื่นๆ set by
 // HRS still get a chip, but only when some candidate has them.
 const FILTERS = ['all', 'รอพิจารณา', 'เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว'];
-const HRS_ONLY_FILTERS = ['สำรอง', 'ไม่พิจารณา'];
+const HRS_ONLY_FILTERS = ['ผ่านการพิจารณา', 'สำรอง', 'ไม่ผ่านการพิจารณา', 'อื่นๆ'];
 
 export function mountPjt(root, { store, session, signOut, onCleanup }) {
   const unit = session.unit;

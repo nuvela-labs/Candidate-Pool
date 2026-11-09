@@ -1,7 +1,7 @@
 // Candidate profile popup: everything about one candidate in one place.
 // `actions` = [{ id, label, primary, danger }]; the popup closes before onAction runs.
 import {
-  esc, ICONS, HRS, POOL, DECISION_STYLE, INTERVIEW_STATUS, MODE_LABEL, avatarFor, recommendationFor, recLabel,
+  esc, ICONS, HRS, POOL, DECISION_STYLE, decisionLabel, INTERVIEW_STATUS, MODE_LABEL, avatarFor, recommendationFor, recLabel,
   fmtDate, fmtDateTime, baht, pct, openModal, isNew, NEW_BADGE, holdLeft, safeUrl, locLabel, unitFullLabel, matchColor, candScore, scoredDims, DIMENSIONS, dimInfo, NOTE_FROM, preTag, scoreNote
 } from './ui.js';
 
@@ -87,7 +87,7 @@ export function openProfile(c, { actions = [], onAction, showSalary = true, show
 
     <div class="profile-status">
       <span class="pill" style="background:var(--soft);color:var(--ink)">อยู่ที่ ${esc(where)}</span>
-      <span class="pill" style="background:${ds.bg};color:${ds.fg}">${esc(c.decision || 'รอพิจารณา')}</span>
+      <span class="pill" style="background:${ds.bg};color:${ds.fg}">${esc(decisionLabel(c))}</span>
       ${preTag(c)}
       ${hold ? `<span class="pill" style="background:${hold.urgent ? '#FDECEA' : '#FFF6D6'};color:${hold.urgent ? '#8A1C12' : '#5C4300'}">เด้งกลับ Candidate Pool ใน ${esc(hold.text)}</span>` : ''}
     </div>

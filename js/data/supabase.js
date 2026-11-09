@@ -2,9 +2,9 @@
 // Permissions are enforced server-side by row-level security and the functions
 // in supabase/*.sql; the checks here only give friendlier messages.
 import { CONFIG, accountEmail } from '../config.js';
-import { validateInterview, validateUnitCode } from './rules.js';
+import { validateInterview, validateUnitCode, decisionNote } from './rules.js';
 import { loadLib } from '../cdn.js';
-import { candScore } from '../ui.js';
+import { candScore, KEEPS_INTERVIEW } from '../ui.js';
 
 let client = null;
 let profile = null;
@@ -23,7 +23,7 @@ const fromRow = (r) => ({
   id: r.id, name: r.name, position: r.position, age: r.age, experience: r.experience,
   education: r.education, company: r.company, cvUrl: r.cv_url,
   match: r.hr_match == null ? null : Number(r.hr_match), prescreenDate: r.prescreen_date,
-  recommendation: r.recommendation, hrNote: r.hr_note, decision: r.decision,
+  recommendation: r.recommendation, hrNote: r.hr_note, decision: r.decision === 'ไม่พิจารณา' ? 'ไม่ผ่านการพิจารณา' : r.decision, decisionNote: r.decision_note || '',
   interviewAt: r.interview_at, interviewMode: r.interview_mode, interviewStatus: r.interview_status,
   interviewers: Array.isArray(r.interviewers) ? r.interviewers : [],
   interviewLocation: r.interview_location || '', meetingLink: r.meeting_link || '',
@@ -43,7 +43,7 @@ const toRow = (c) => ({
   cv_url: c.cvUrl || null,
   hr_match: c.match ?? null, prescreen_date: c.prescreenDate || null,
   recommendation: c.recommendation || null, hr_note: c.hrNote || null,
-  decision: c.decision || 'รอพิจารณา',
+  decision: c.decision || 'รอพิจารณา', decision_note: c.decision === 'อื่นๆ' ? c.decisionNote || null : null,
   interview_at: c.interviewAt || null, interview_mode: c.interviewMode || null,
   interview_status: c.interviewStatus || null, interviewers: c.interviewers || [],
   interview_location: c.interviewLocation || null, meeting_link: c.meetingLink || null,
@@ -239,11 +239,11 @@ export const supabaseStore = {
 
   async pick(id) { const c = await sb(); return fromRow(check(await c.rpc('pjt_pick', { p_id: id }))); },
   async returnToPool(id) { const c = await sb(); return fromRow(check(await c.rpc('pjt_return', { p_id: id }))); },
-  async setDecision(id, decision) {
+  async setDecision(id, decision, note) {
     const c = await sb();
     if (isAdmin()) {
-      const keep = decision === 'เรียกสัมภาษณ์' || decision === 'นัดสัมภาษณ์แล้ว';
-      return fromRow(check(await c.from('candidates').update({ decision, ...(keep ? {} : CLEAR_INTERVIEW_ROW) }).eq('id', id).select().single()));
+      const keep = KEEPS_INTERVIEW.includes(decision);
+      return fromRow(check(await c.from('candidates').update({ decision, decision_note: decisionNote(decision, note), ...(keep ? {} : CLEAR_INTERVIEW_ROW) }).eq('id', id).select().single()));
     }
     return fromRow(check(await c.rpc('pjt_set_decision', { p_id: id, p_decision: decision })));
   },

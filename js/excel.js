@@ -1,6 +1,6 @@
 // Import from / export to the existing Candidate Marketplace workbook layout.
 // SheetJS is loaded only when an admin imports or exports.
-import { POOL, UNITS, DECISIONS, DIMENSIONS, cleanScores, candScore, nextCandidateIds, recKey, recLabel, locLabel, interviewerText, safeUrl } from './ui.js';
+import { POOL, UNITS, DECISIONS, OTHER, decisionLabel, DIMENSIONS, cleanScores, candScore, nextCandidateIds, recKey, recLabel, locLabel, interviewerText, safeUrl } from './ui.js';
 import { loadLib } from './cdn.js';
 
 const loadXLSX = () => loadLib('xlsx').catch(() => {
@@ -87,7 +87,11 @@ export async function parseWorkbook(file, existing = []) {
       let location = sheetLoc;
       if (/^return to hr$/i.test(dest)) location = POOL;
       else if (UNITS.includes(dest.toUpperCase())) location = dest.toUpperCase();
-      const decision = DECISIONS.includes(String(raw.decision).trim()) ? String(raw.decision).trim() : 'รอพิจารณา';
+      // A status outside the list is HRS's own wording (exported from "อื่นๆ"), so it comes back as อื่นๆ.
+      const rawDecision = String(raw.decision ?? '').trim().replace(/^ไม่พิจารณา$/, 'ไม่ผ่านการพิจารณา');
+      const known = DECISIONS.includes(rawDecision) && rawDecision !== OTHER;
+      const decision = known ? rawDecision : rawDecision ? OTHER : 'รอพิจารณา';
+      const decisionNote = decision === OTHER ? rawDecision.slice(0, 60) : null;
 
       const record = {
         id, name: nameVal,
@@ -100,7 +104,7 @@ export async function parseWorkbook(file, existing = []) {
         prescreenDate: excelDate(raw.prescreenDate, false),
         recommendation: recKey(rec),
         hrNote: String(raw.hrNote ?? (recKey(rec) ? '' : rec)).trim(),
-        decision,
+        decision, decisionNote,
         interviewAt: excelDate(raw.interviewAt, true),
         // The workbook has one free-text interviewer cell; position/ฝ่าย are filled in later.
         interviewers: String(raw.interviewer ?? '').trim() ? [{ name: String(raw.interviewer).trim(), position: '', department: '' }] : [],
@@ -137,7 +141,7 @@ export async function exportWorkbook(candidates) {
     'Pre-interview': c.preInterviewed ? 'Yes' : 'No', 'Email': c.email || '', 'เบอร์โทรศัพท์': c.phone || '',
     'Resume/CV': c.cvUrl, 'เงินเดือนปัจจุบัน': c.salaryCurrent, 'เงินเดือนคาดหวัง': c.salaryExpected,
     'Candidate Score %': candScore(c) == null ? '' : Math.round(candScore(c) * 100), 'วันที่ Prescreen': c.prescreenDate, 'HR Recommendation': recLabel(c.recommendation),
-    'HR Highlight': c.hrNote, 'Executive Decision': c.decision,
+    'HR Highlight': c.hrNote, 'Executive Decision': decisionLabel(c),
     'วัน/เวลา ที่ต้องการนัดสัมภาษณ์': c.interviewAt ? new Date(c.interviewAt).toLocaleString('th-TH') : '',
     'สถานะนัด': c.interviewStatus === 'confirmed' ? 'ยืนยันแล้ว' : c.interviewStatus === 'requested' ? 'รอยืนยัน' : '',
     'รูปแบบ': c.interviewMode === 'online' ? 'Online' : c.interviewMode === 'onsite' ? 'Onsite' : '',

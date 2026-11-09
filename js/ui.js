@@ -32,13 +32,21 @@ export function interviewerText(list) {
   return (list || []).map((p) => [p.name, [p.position, p.department].filter(Boolean).join(', ')].filter(Boolean).join(' — ')).join('; ');
 }
 
-export const DECISIONS = ['รอพิจารณา', 'เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว', 'สำรอง', 'ไม่พิจารณา'];
+export const DECISIONS = ['รอพิจารณา', 'เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว', 'ผ่านการพิจารณา', 'สำรอง', 'ไม่ผ่านการพิจารณา', 'อื่นๆ'];
+// "อื่นๆ": HRS types the status itself; the text is stored in decisionNote and shown instead of "อื่นๆ".
+export const OTHER = 'อื่นๆ';
+export const decisionLabel = (c) => (c.decision === OTHER && c.decisionNote ? c.decisionNote : c.decision || 'รอพิจารณา');
+// Statuses that keep the candidate's interview details ("ผ่านการพิจารณา" usually follows the interview;
+// "อื่นๆ" is free text, so nothing is cleared on a guess).
+export const KEEPS_INTERVIEW = ['เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว', 'ผ่านการพิจารณา', 'อื่นๆ'];
 export const DECISION_STYLE = {
   'รอพิจารณา': { color: '#FFD84D', bg: '#FFF1C2', fg: '#5C4300' },
   'เรียกสัมภาษณ์': { color: '#C8F169', bg: '#E8FBC4', fg: '#2E4A00' },
   'นัดสัมภาษณ์แล้ว': { color: '#5B3DF5', bg: '#5B3DF5', fg: '#FFFFFF' },
+  'ผ่านการพิจารณา': { color: '#1FAE6B', bg: '#CDEFDC', fg: '#0B4A2C' },
   'สำรอง': { color: '#8EC5FF', bg: '#DCE8FF', fg: '#1D3A7A' },
-  'ไม่พิจารณา': { color: '#111111', bg: '#ECEBE7', fg: '#3D3C38' }
+  'ไม่ผ่านการพิจารณา': { color: '#111111', bg: '#ECEBE7', fg: '#3D3C38' },
+  'อื่นๆ': { color: '#FF8FBF', bg: '#FFE3EE', fg: '#6B1238' }
 };
 export const RECOMMENDATIONS = ['Strongly Recommend', 'Recommend', 'Consider', 'Review'];
 // Stored in English (database and Excel keys); shown in Thai.

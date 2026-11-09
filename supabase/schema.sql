@@ -36,7 +36,8 @@ create table if not exists public.candidates (
   recommendation   text,
   hr_note          text,
   decision         text not null default 'รอพิจารณา'
-                   check (decision in ('รอพิจารณา', 'เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว', 'สำรอง', 'ไม่พิจารณา')),
+                   check (decision in ('รอพิจารณา', 'เรียกสัมภาษณ์', 'นัดสัมภาษณ์แล้ว', 'ผ่านการพิจารณา', 'สำรอง', 'ไม่ผ่านการพิจารณา', 'อื่นๆ')),
+  decision_note    text check (decision_note is null or char_length(decision_note) between 1 and 60),
   interview_at     timestamptz,
   interviewer      text,
   project_name     text,

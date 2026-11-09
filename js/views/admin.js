@@ -1,7 +1,7 @@
 // HRS back office: overview + interview requests, full candidate pool control,
 // interview calendar, users & permissions.
 import {
-  esc, ICONS, LOGO, POOL, HRS, LOCATIONS, DECISIONS, DECISION_STYLE, RECOMMENDATIONS, recLabel, DIMENSIONS, dimInfo, cleanScores, MODE_LABEL,
+  esc, ICONS, LOGO, POOL, HRS, LOCATIONS, DECISIONS, KEEPS_INTERVIEW, OTHER, decisionLabel, DECISION_STYLE, RECOMMENDATIONS, recLabel, DIMENSIONS, dimInfo, cleanScores, MODE_LABEL,
   INTERVIEW_STATUS, locStyle, locLabel, unitFullLabel, pct, fmtDateTime, toast, openModal,
   confirmDialog, errorMessage, isNew, NEW_BADGE, holdLeft, DIVISIONS, setOrg, isWebUrl, goHome, matchColor, candScore, NOTE_FROM, nextCandidateIds, preTag, scoreNote, menuHTML
 } from '../ui.js';
@@ -248,7 +248,8 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
               </td>
               <td data-label="Candidate Score" style="font-weight:700;color:${matchColor(candScore(c)).text}">${pct(candScore(c))}</td>
               <td data-label="Executive Decision"><label class="sr-only" for="dec-${esc(c.id)}">Executive Decision ของ ${esc(c.id)}</label><select id="dec-${esc(c.id)}" class="decision-select" data-decision="${esc(c.id)}" style="background-color:${ds.bg};color:${ds.fg}" title="เปลี่ยนสถานะ">
-                ${DECISIONS.map((d) => `<option value="${esc(d)}" ${d === (c.decision || 'รอพิจารณา') ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+                ${DECISIONS.map((d) => `<option value="${esc(d)}" ${d === (c.decision || 'รอพิจารณา') ? 'selected' : ''}>${esc(d === OTHER ? (c.decision === OTHER ? decisionLabel(c) : 'อื่นๆ (พิมพ์เอง)…') : d)}</option>`).join('')}
+                ${c.decision === OTHER ? '<option value="__edit">แก้ข้อความสถานะ…</option>' : ''}
               </select></td>
               <td data-label="นัดสัมภาษณ์">${ist
                 ? `<button type="button" class="pill" data-detail="${esc(c.id)}" style="border:0;cursor:pointer;background:${ist.bg};color:${ist.fg}">${esc(ist.label)}</button>`
@@ -436,6 +437,9 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         ${f('prescreenDate', 'วันที่ Prescreen', v.prescreenDate, 'date')}
         <div class="field"><label for="cf-rec">HR Recommendation</label><select id="cf-rec" name="recommendation" class="input"><option value="">อัตโนมัติจาก Candidate Score</option>${RECOMMENDATIONS.map((r) => `<option value="${r}" ${r === v.recommendation ? 'selected' : ''}>${recLabel(r)}</option>`).join('')}</select></div>
         <div class="field"><label for="cf-loc">อยู่ที่ Pool</label><select id="cf-loc" name="location" class="input">${LOCATIONS.map((l) => `<option value="${esc(l)}" ${l === v.location ? 'selected' : ''}>${esc(locLabel(l))}</option>`).join('')}</select></div>
+        <div class="field"><label for="cf-dec">Executive Decision</label><select id="cf-dec" name="decision" class="input">${DECISIONS.map((d) => `<option value="${esc(d)}" ${d === (v.decision || 'รอพิจารณา') ? 'selected' : ''}>${esc(d === OTHER ? 'อื่นๆ (พิมพ์เอง)' : d)}</option>`).join('')}</select></div>
+        <div class="field" data-dec-other style="${v.decision === OTHER ? '' : 'display:none'}"><label for="cf-decnote">สถานะ (พิมพ์เอง) <span class="muted" style="font-weight:500">· ไม่เกิน 60 ตัวอักษร</span></label><input id="cf-decnote" name="decisionNote" class="input" maxlength="60" value="${esc(v.decisionNote || '')}" placeholder="เช่น รอเอกสารเพิ่มเติม" autocomplete="off"></div>
+        ${!isNew && v.interviewStatus ? '<div class="warn-box span-2" data-dec-warn style="display:none;font-size:14px">สถานะนี้จะยกเลิกนัดสัมภาษณ์ที่มีอยู่ของผู้สมัครคนนี้เมื่อกดบันทึก</div>' : ''}
         <div class="field span-2"><label for="cf-note">ความเห็นจาก ${esc(NOTE_FROM)} (HR Highlight) <span class="muted" style="font-weight:500">· การ์ดแสดง 30 ตัวอักษรแรก</span></label><textarea id="cf-note" name="hrNote" class="input" rows="${draft ? 5 : 3}">${esc(v.hrNote || '')}</textarea></div>
         <fieldset class="span-2 score-set">
           <legend>คะแนนรายมิติ (1 ต่ำ – 5 สูง) ใช้คำนวณ Candidate Score และกราฟเปรียบเทียบ</legend>
@@ -461,6 +465,14 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         });
         return miss;
       };
+      // "อื่นๆ" shows the text box; a status that drops the interview shows a warning first.
+      const decSel = form.elements.decision, decOther = dlg.querySelector('[data-dec-other]'), decWarn = dlg.querySelector('[data-dec-warn]');
+      decSel.addEventListener('change', () => {
+        const other = decSel.value === OTHER;
+        decOther.style.display = other ? '' : 'none';
+        if (other) form.elements.decisionNote.focus();
+        if (decWarn) decWarn.style.display = decSel.value !== (c.decision || 'รอพิจารณา') && !KEEPS_INTERVIEW.includes(decSel.value) ? '' : 'none';
+      });
       form.addEventListener('input', (e) => {
         const fld = e.target.closest('.field.missing');
         if (fld && String(e.target.value).trim()) { fld.classList.remove('missing'); e.target.removeAttribute('aria-invalid'); }
@@ -477,12 +489,24 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         const d = Object.fromEntries(new FormData(form));
         const scores = cleanScores(Object.fromEntries(DIMENSIONS.map((dm) => [dm.key, d['s_' + dm.key]])));
         DIMENSIONS.forEach((dm) => delete d['s_' + dm.key]);
+        const decision = d.decision || 'รอพิจารณา';
+        const note = decision === OTHER ? String(d.decisionNote || '').trim() : '';
+        delete d.decision; delete d.decisionNote;
+        if (decision === OTHER && !note) {
+          err.hidden = false; err.textContent = 'เลือก "อื่นๆ" แล้ว กรุณาพิมพ์สถานะ';
+          form.elements.decisionNote.focus();
+          return;
+        }
+        // A new candidate is saved with its status. For an existing one the status goes through
+        // setDecision after saving, so a status that drops the interview clears it the usual way.
+        const decisionChanged = !isNew && (decision !== (c.decision || 'รอพิจารณา') || (decision === OTHER && note !== (c.decisionNote || '')));
         const rec = {
           ...(c || {}), ...d,
           id: d.id.trim(), name: d.name.trim(),
           age: n(d.age), experience: n(d.experience), salaryCurrent: n(d.salaryCurrent), salaryExpected: n(d.salaryExpected),
           prescreenDate: d.prescreenDate || null,
-          decision: (c && c.decision) || 'รอพิจารณา',
+          decision: isNew ? decision : (c.decision || 'รอพิจารณา'),
+          decisionNote: isNew ? (note || null) : (c.decisionNote || null),
           showSalary: form.elements.showSalary.checked,
           preInterviewed: form.elements.preInterviewed.checked,
           scores,
@@ -495,6 +519,7 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         if (rec.cvUrl && !isWebUrl(rec.cvUrl)) { err.hidden = false; err.textContent = 'ลิงก์ Resume / CV ต้องขึ้นต้นด้วย https:// หรือ http://'; return; }
         try {
           await store.saveCandidate(rec, isNew);
+          if (decisionChanged) await store.setDecision(rec.id, decision, note);
           close(); await reload();
           toast(isNew ? `เพิ่ม ${rec.id} แล้ว` : `บันทึก ${rec.id} แล้ว`);
         } catch (ex) { err.hidden = false; err.textContent = errorMessage(ex); }
@@ -796,8 +821,14 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
     }
     if (el.dataset.decision) {
       const c = byId(el.dataset.decision), to = el.value;
-      // Any status other than เรียกสัมภาษณ์ / นัดสัมภาษณ์แล้ว clears the candidate's interview, so ask first.
-      if (c.interviewStatus && to !== 'เรียกสัมภาษณ์' && to !== 'นัดสัมภาษณ์แล้ว') {
+      // "อื่นๆ" (or editing its text): HRS types the status; cancelling leaves everything as it was.
+      if (to === OTHER || to === '__edit') {
+        const note = await askStatusText(c.decision === OTHER ? c.decisionNote : '');
+        if (note == null) return render();
+        return run(() => store.setDecision(c.id, OTHER, note), `เปลี่ยนสถานะ ${c.id} เป็น "${note}" แล้ว`);
+      }
+      // Statuses outside KEEPS_INTERVIEW clear the candidate's interview, so ask first.
+      if (c.interviewStatus && !KEEPS_INTERVIEW.includes(to)) {
         const ok = await confirmDialog({
           title: `เปลี่ยน ${c.id} เป็น "${to}"?`,
           body: 'นัดสัมภาษณ์ที่มีอยู่ของผู้สมัครคนนี้จะถูกยกเลิก', confirm: 'เปลี่ยนสถานะ'
@@ -840,4 +871,38 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
 
   render();
   reload({ animate: true });
+}
+
+// Popup for the "อื่นๆ" status: resolves to the typed text, or null when cancelled.
+function askStatusText(current = '') {
+  return new Promise((resolve) => {
+    let done = false;
+    openModal(`
+      <div class="modal-head"><h2 id="modal-title">พิมพ์สถานะ</h2></div>
+      <form data-status-form novalidate>
+        <label for="status-text" class="sr-only">สถานะ</label>
+        <input id="status-text" class="input" maxlength="60" required value="${esc(current)}" placeholder="เช่น รอเอกสารเพิ่มเติม" autocomplete="off">
+        <p class="muted" style="font-size:13px;margin-top:6px">ไม่เกิน 60 ตัวอักษร ข้อความนี้จะแสดงแทนคำว่า "อื่นๆ"</p>
+        <div class="error-box" data-err hidden role="alert"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn" data-close>ยกเลิก</button>
+          <button type="submit" class="btn btn-dark">บันทึกสถานะ</button>
+        </div>
+      </form>`, (dlg, close) => {
+      const input = dlg.querySelector('#status-text');
+      const err = dlg.querySelector('[data-err]');
+      setTimeout(() => { input.focus(); input.select(); }, 0);
+      dlg.querySelector('[data-status-form]').onsubmit = (e) => {
+        e.preventDefault();
+        const v = input.value.trim();
+        if (!v) { err.hidden = false; err.textContent = 'กรุณาพิมพ์สถานะ'; input.focus(); return; }
+        done = true; close(); resolve(v);
+      };
+      input.oninput = () => { err.hidden = true; };
+      const obs = new MutationObserver(() => {
+        if (!dlg.isConnected) { obs.disconnect(); if (!done) resolve(null); }
+      });
+      obs.observe(document.getElementById('modal-root'), { childList: true });
+    });
+  });
 }
