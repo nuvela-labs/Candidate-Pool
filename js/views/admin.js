@@ -247,7 +247,9 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
                 <span class="pool-sub"><span class="mono">${esc(c.id)}</span>${pos ? '' : ` · ${esc(c.position || '—')}`}${isNew(c) ? ` ${NEW_BADGE}` : ''} ${preTag(c)}${c.showSalary ? ' <span class="sal-tag" title="แผนกเห็นเงินเดือนของผู้สมัครคนนี้">฿ แผนกเห็นเงินเดือน</span>' : ''}</span>
               </td>
               <td data-label="Candidate Score" style="font-weight:700;color:${matchColor(candScore(c)).text}">${pct(candScore(c))}</td>
-              <td data-label="Executive Decision"><span class="pill decision-pill" style="background:${ds.bg};color:${ds.fg}">${esc(c.decision || 'รอพิจารณา')}</span></td>
+              <td data-label="Executive Decision"><label class="sr-only" for="dec-${esc(c.id)}">Executive Decision ของ ${esc(c.id)}</label><select id="dec-${esc(c.id)}" class="decision-select" data-decision="${esc(c.id)}" style="background-color:${ds.bg};color:${ds.fg}" title="เปลี่ยนสถานะ">
+                ${DECISIONS.map((d) => `<option value="${esc(d)}" ${d === (c.decision || 'รอพิจารณา') ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+              </select></td>
               <td data-label="นัดสัมภาษณ์">${ist
                 ? `<button type="button" class="pill" data-detail="${esc(c.id)}" style="border:0;cursor:pointer;background:${ist.bg};color:${ist.fg}">${esc(ist.label)}</button>`
                 : ''}</td>
@@ -429,8 +431,8 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         ${f('cvUrl', 'ลิงก์ Resume / CV', v.cvUrl, 'url')}
         ${f('salaryCurrent', 'เงินเดือนปัจจุบัน', v.salaryCurrent, 'number')}
         ${f('salaryExpected', 'เงินเดือนคาดหวัง', v.salaryExpected, 'number')}
-        <label class="span-2 pre-check"><input type="checkbox" name="preInterviewed" ${v.preInterviewed ? 'checked' : ''}><span>Pre-interview แล้ว <span class="muted" style="font-weight:500">· การ์ดผู้สมัครจะแสดง "Pre-interviewed"</span></span></label>
-        <label class="span-2" style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;min-height:44px"><input type="checkbox" name="showSalary" ${v.showSalary ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--violet)">ให้แผนกเห็นเงินเดือนของผู้สมัครรายนี้</label>
+        <div class="span-2 pre-check"><input type="checkbox" id="cf-pre" name="preInterviewed" aria-labelledby="cf-pre-t" ${v.preInterviewed ? 'checked' : ''}><span id="cf-pre-t">Pre-interview แล้ว <span class="muted" style="font-weight:500">· การ์ดผู้สมัครจะแสดง "Pre-interviewed"</span></span></div>
+        <div class="span-2" style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;min-height:44px"><input type="checkbox" id="cf-sal" name="showSalary" aria-labelledby="cf-sal-t" ${v.showSalary ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--violet)"><span id="cf-sal-t">ให้แผนกเห็นเงินเดือนของผู้สมัครรายนี้</span></div>
         ${f('prescreenDate', 'วันที่ Prescreen', v.prescreenDate, 'date')}
         <div class="field"><label for="cf-rec">HR Recommendation</label><select id="cf-rec" name="recommendation" class="input"><option value="">อัตโนมัติจาก Candidate Score</option>${RECOMMENDATIONS.map((r) => `<option value="${r}" ${r === v.recommendation ? 'selected' : ''}>${recLabel(r)}</option>`).join('')}</select></div>
         <div class="field"><label for="cf-loc">อยู่ที่ Pool</label><select id="cf-loc" name="location" class="input">${LOCATIONS.map((l) => `<option value="${esc(l)}" ${l === v.location ? 'selected' : ''}>${esc(locLabel(l))}</option>`).join('')}</select></div>
@@ -781,7 +783,7 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
       if (ok) { await store.resetDemoData(); reload({ animate: true }); toast('ล้างข้อมูลสาธิตแล้ว'); }
     }
   };
-  root.onchange = (e) => {
+  root.onchange = async (e) => {
     const el = e.target;
     if (el.dataset.sel) { el.checked ? st.sel.add(el.dataset.sel) : st.sel.delete(el.dataset.sel); return render(); }
     if (el.dataset.selAll !== undefined) { visibleRows().forEach((c) => (el.checked ? st.sel.add(c.id) : st.sel.delete(c.id))); return render(); }
@@ -791,6 +793,18 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
       const back = root.querySelector('#' + el.id);
       if (back) back.focus();
       return;
+    }
+    if (el.dataset.decision) {
+      const c = byId(el.dataset.decision), to = el.value;
+      // Any status other than เรียกสัมภาษณ์ / นัดสัมภาษณ์แล้ว clears the candidate's interview, so ask first.
+      if (c.interviewStatus && to !== 'เรียกสัมภาษณ์' && to !== 'นัดสัมภาษณ์แล้ว') {
+        const ok = await confirmDialog({
+          title: `เปลี่ยน ${c.id} เป็น "${to}"?`,
+          body: 'นัดสัมภาษณ์ที่มีอยู่ของผู้สมัครคนนี้จะถูกยกเลิก', confirm: 'เปลี่ยนสถานะ'
+        });
+        if (!ok) return render();
+      }
+      return run(() => store.setDecision(c.id, to), `เปลี่ยนสถานะ ${c.id} เป็น "${to}" แล้ว`);
     }
     if (el.dataset.move && el.value) {
       const c = byId(el.dataset.move), to = el.value;

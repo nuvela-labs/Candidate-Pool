@@ -85,12 +85,12 @@ export function openCompare(all, preselected = [], { pos = 'all' } = {}) {
       listEl.innerHTML = rows.map((c) => {
         const n = picked.indexOf(c.id);
         const full = n < 0 && picked.length >= MAX;
-        return `<label class="compare-item${n >= 0 ? ' on' : ''}">
-          <input type="checkbox" data-pick="${esc(c.id)}" ${n >= 0 ? 'checked' : ''} ${full ? 'disabled' : ''}>
+        return `<div class="compare-item${n >= 0 ? ' on' : ''}">
+          <input type="checkbox" data-pick="${esc(c.id)}" aria-labelledby="cmp-n-${esc(c.id)}" ${n >= 0 ? 'checked' : ''} ${full ? 'disabled' : ''}>
           <span class="swatch" aria-hidden="true" style="background:${n >= 0 ? COLORS[n].stroke : 'transparent'}"></span>
-          <span style="flex:1;display:flex;flex-direction:column;min-width:0"><strong>${esc(c.name)}</strong><span class="muted" style="font-size:13px">${esc(c.id)} · ${esc(c.position || '')} · ${pct(candScore(c))}${scoredCount(c) ? '' : ' · ยังไม่มีคะแนน'}</span></span>
+          <span style="flex:1;display:flex;flex-direction:column;min-width:0"><strong id="cmp-n-${esc(c.id)}">${esc(c.name)}</strong><span class="muted" style="font-size:13px">${esc(c.id)} · ${esc(c.position || '')} · ${pct(candScore(c))}${scoredCount(c) ? '' : ' · ยังไม่มีคะแนน'}</span></span>
           ${isNew(c) ? NEW_BADGE : ''}
-        </label>`;
+        </div>`;
       }).join('') || '<p class="muted" style="padding:12px">ไม่พบผู้สมัคร</p>';
     };
 

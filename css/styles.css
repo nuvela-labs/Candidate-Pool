@@ -398,7 +398,7 @@ tbody th { color: var(--ink); border-top: 1px solid #EFEDE7; }
 .tip.below::after { bottom: auto; top: -7px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 @media (prefers-reduced-motion: reduce) { .tip { animation: none; } }
 /* flex: none — inside the height-capped list, items must scroll, never squash. */
-.compare-item { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--soft); cursor: pointer; min-height: 44px; line-height: 1.45; }
+.compare-item { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--soft); cursor: default; min-height: 44px; line-height: 1.45; }
 .compare-item .new-badge { flex: none; }
 .compare-item.on { background: #F1EDFF; }
 .compare-item input { width: 18px; height: 18px; accent-color: var(--violet); flex: none; }
@@ -477,3 +477,10 @@ tbody th { color: var(--ink); border-top: 1px solid #EFEDE7; }
 .sal-tag { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; background: #FFF6D6; color: #6B4E00; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .card-tags:empty { display: none; }
 .login-foot { display: flex; justify-content: flex-end; padding: 0 clamp(16px, 4vw, 56px) 24px; }
+.compare-item input { cursor: pointer; }
+/* Executive Decision in the HRS table: a status pill that opens a list of statuses */
+.decision-select { appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; padding: 6px 30px 6px 14px; min-height: 34px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 11px center; }
+.decision-select:hover { box-shadow: 0 0 0 1.5px var(--ink) inset; }
+.decision-select option { background: #fff; color: var(--ink); }
