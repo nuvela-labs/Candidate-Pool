@@ -324,5 +324,27 @@ export const supabaseStore = {
     if (!ids.length) return;
     const c = await sb();
     check(await c.from('notifications').update({ read_at: new Date().toISOString() }).in('id', ids));
-  }
+  },
+
+  // ---- usage log (supabase/014_usage_log.sql) ----
+  // The database fills in who and when; accounts can add rows but only HRS can read them.
+  async logEvent({ action, candidateId = null, meta = {} }) {
+    if (!profile) return;
+    const c = await sb();
+    check(await c.from('usage_events').insert({ action, candidate_id: candidateId, meta }));
+  },
+  async listEvents({ since } = {}) {
+    const c = await sb();
+    const out = [];
+    // Pages of 1,000 (the API's row cap), newest first, up to 20,000 rows.
+    for (let from = 0; from < 20000; from += 1000) {
+      let q = c.from('usage_events').select('id, at, user_id, role, unit, action, candidate_id, meta')
+        .order('at', { ascending: false }).range(from, from + 999);
+      if (since) q = q.gte('at', since);
+      const rows = check(await q);
+      out.push(...rows.map((r) => ({ id: r.id, at: r.at, userId: r.user_id, role: r.role, unit: r.unit, action: r.action, candidateId: r.candidate_id, meta: r.meta || {} })));
+      if (rows.length < 1000) break;
+    }
+    return out;
+  },
 };

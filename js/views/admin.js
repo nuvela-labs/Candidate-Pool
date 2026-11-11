@@ -10,6 +10,7 @@ import { newFilterState, positionsOf, applyFilters, groupByPosition, filterBarHT
 import { CONFIG } from '../config.js';
 import { openInterviewForm, showInterviewDetail } from '../interview.js';
 import { calendarHTML, monthStart, shiftMonth } from '../calendar.js';
+import { usageHTML, usageSince, downloadUsageCsv } from './usage.js';
 import { openCompare } from '../compare.js';
 import { bellHTML, openNotifications, watchNotifications } from '../notify.js';
 import { openProfile } from '../profile.js';
@@ -19,9 +20,11 @@ const TABS = [
   { key: 'overview', label: 'ภาพรวม', dot: '#C8F169', shape: '999px' },
   { key: 'pool', label: 'ผู้สมัครทั้งหมด', dot: '#FF7A3D', shape: '12px 12px 0 0' },
   { key: 'calendar', label: 'ปฏิทินสัมภาษณ์', dot: '#FFB3D1', shape: '0 0 0 12px' },
+  { key: 'usage', label: 'การใช้งาน', dot: '#FFD84D', shape: '0 12px 0 12px' },
   { key: 'users', label: 'ผู้ใช้และสิทธิ์', dot: '#8EC5FF', shape: '3px' }
 ];
 const HEAD = {
+  usage: ['การใช้งานระบบ', 'แต่ละบัญชีเข้ามาใช้งานกี่ครั้งและทำอะไรบ้าง เช่น เลือกผู้สมัครเข้า Pool นัดสัมภาษณ์ และเปรียบเทียบผู้สมัคร'],
   overview: ['ภาพรวมระบบ', 'สรุปผู้สมัครทุก Pool และคำขอนัดสัมภาษณ์ที่รอยืนยัน'],
   pool: ['ผู้สมัครทั้งหมด', `ในฐานะ ${HRS} คุณส่งผู้สมัครเข้า Pool ของทุกแผนก ดึงกลับ Candidate Pool จัดนัด และแก้ไขสถานะได้ทุกรายการ`],
   calendar: ['ปฏิทินสัมภาษณ์', 'นัดสัมภาษณ์ของทุกแผนก คลิกที่นัดเพื่อดูรายละเอียดหรือยืนยัน'],
@@ -48,9 +51,19 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
   const st = {
     tab: 'overview', list: [], users: [], notifs: [], loc: 'all', q: '', loading: true, error: '',
     animate: true, month: monthStart(), f: newFilterState(),
-    sel: new Set() // candidate ids ticked on ผู้สมัครทั้งหมด, for bulk actions
+    sel: new Set(), // candidate ids ticked on ผู้สมัครทั้งหมด, for bulk actions
+    usage: { mode: 'all', days: 30, acct: '', events: [], loading: true, error: '' } // การใช้งาน tab
   };
 
+  // การใช้งาน tab: the usage log for the chosen period, loaded when the tab opens.
+  async function loadUsage() {
+    const u = st.usage;
+    u.loading = true; render();
+    try { u.events = await store.listEvents({ since: usageSince(u.days) }); u.error = ''; }
+    catch (e) { u.events = []; u.error = `${errorMessage(e)} (ถ้าเพิ่งเปิดใช้ ต้องรัน supabase/014_usage_log.sql ก่อน)`; }
+    u.loading = false;
+    if (st.tab === 'usage') render();
+  }
   async function reload({ animate = false } = {}) {
     try {
       const [list, users] = await Promise.all([store.listCandidates(), store.listUsers()]);
@@ -177,7 +190,7 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
     if (kind === 'clear') { st.sel.clear(); return render(); }
     if (kind === 'compare') return openCompare(st.list, picked.map((c) => c.id));
     if (kind === 'export') {
-      try { const { exportWorkbook } = await import('../excel.js'); await exportWorkbook(picked); }
+      try { const { exportWorkbook } = await import('../excel.js'); await exportWorkbook(picked); store.track('excel_export', { meta: { count: picked.length } }); }
       catch (ex) { toast(errorMessage(ex), { error: true }); }
       return;
     }
@@ -374,7 +387,8 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
         <div data-section style="display:flex;flex-direction:column;gap:20px">
           ${st.loading ? '<div class="loading" style="min-height:200px"><div class="spinner" role="img" aria-label="กำลังโหลด"></div></div>'
             : st.tab === 'overview' ? overview() : st.tab === 'pool' ? pool()
-            : st.tab === 'calendar' ? calendarHTML(st.month, st.list, { showUnit: true }) : users()}
+            : st.tab === 'calendar' ? calendarHTML(st.month, st.list, { showUnit: true })
+            : st.tab === 'usage' ? usageHTML(st.usage) : users()}
         </div>
       </main>
     </div>`;
@@ -757,8 +771,14 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
       }
       return;
     }
-    if ((el = t('[data-tab]'))) { st.tab = el.dataset.tab; st.animate = true; return render(); }
-    if ((el = t('[data-refresh]'))) return reload({ animate: true });
+    if ((el = t('[data-tab]'))) { st.tab = el.dataset.tab; st.animate = true; render(); if (st.tab === 'usage') loadUsage(); return; }
+    if ((el = t('[data-usage-days]'))) { st.usage.days = Number(el.dataset.usageDays); return loadUsage(); }
+    if ((el = t('[data-usage-mode]'))) { st.usage.mode = el.dataset.usageMode; return render(); }
+    if ((el = t('[data-usage-csv]'))) {
+      const u = st.usage;
+      return downloadUsageCsv(u.acct ? u.events.filter((e) => (e.role === 'admin' ? HRS : e.unit) === u.acct) : u.events, u.days);
+    }
+    if ((el = t('[data-refresh]'))) { if (st.tab === 'usage') loadUsage(); return reload({ animate: true }); }
     if ((el = t('[data-loc]'))) { st.loc = el.dataset.loc; return render(); }
     if ((el = t('[data-cal]'))) {
       const a = el.dataset.cal;
@@ -776,11 +796,11 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
     // A click anywhere on a candidate row (not on its own controls) opens the same popup.
     if ((el = t('tr[data-row]')) && el.dataset.row && !t('button, a, input, select, label, details')) return candidatePopup(byId(el.dataset.row));
     if ((el = t('[data-add]'))) return candidateForm(null);
-    if ((el = t('[data-resume]'))) return openResumeImport({ positions: positionsOf(st.list), onDraft: (d) => candidateForm(null, d) });
+    if ((el = t('[data-resume]'))) return openResumeImport({ positions: positionsOf(st.list), onDraft: (d) => { store.track('resume_import'); candidateForm(null, d); } });
     if ((el = t('[data-edit]'))) return candidateForm(byId(el.dataset.edit));
     if ((el = t('[data-move-form]'))) return moveForm(byId(el.dataset.moveForm));
     if ((el = t('[data-export]'))) {
-      try { const { exportWorkbook } = await import('../excel.js'); await exportWorkbook(st.list); }
+      try { const { exportWorkbook } = await import('../excel.js'); await exportWorkbook(st.list); store.track('excel_export', { meta: { count: st.list.length } }); }
       catch (ex) { toast(errorMessage(ex), { error: true }); }
       return;
     }
@@ -813,6 +833,7 @@ export function mountAdmin(root, { store, session, signOut, onCleanup }) {
     if (el.dataset.sel) { el.checked ? st.sel.add(el.dataset.sel) : st.sel.delete(el.dataset.sel); return render(); }
     if (el.dataset.selAll !== undefined) { visibleRows().forEach((c) => (el.checked ? st.sel.add(c.id) : st.sel.delete(c.id))); return render(); }
     if (el.dataset.bulkMove !== undefined) { return el.value ? bulkMove(el.value) : undefined; }
+    if (el.dataset.usageAcct !== undefined) { st.usage.acct = el.value; return render(); }
     if (updateFilter(st.f, el)) {
       render();
       const back = root.querySelector('#' + el.id);

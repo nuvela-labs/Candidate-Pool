@@ -2,6 +2,7 @@
 import { esc, ICONS, HRS, pct, openModal, isNew, NEW_BADGE, DIMENSIONS, dimTip, dimInfo, candScore, scoreNote } from './ui.js';
 import * as anim from './anim.js';
 import { positionsOf } from './filters.js';
+import { store } from './data/store.js';
 
 const MAX = 4;
 const COLORS = [
@@ -45,6 +46,7 @@ function radarSVG(picked) {
 // all: candidates to choose from; preselected: ids to start with;
 // pos: starting position filter (a preselected candidate's position wins).
 export function openCompare(all, preselected = [], { pos = 'all' } = {}) {
+  let logged = false; // one "compare" in the usage log per window, once 2+ candidates are shown
   let picked = preselected.filter((id) => all.some((c) => c.id === id)).slice(0, MAX);
   let q = '';
   const posOf = (c) => c.position || '(ไม่ระบุตำแหน่ง)';
@@ -96,6 +98,7 @@ export function openCompare(all, preselected = [], { pos = 'all' } = {}) {
 
     const drawChart = () => {
       const sel = picked.map((id) => all.find((c) => c.id === id));
+      if (!logged && sel.length >= 2) { logged = true; store.track('compare', { meta: { count: sel.length, ids: picked.slice() } }); }
       if (!sel.length) {
         chartEl.innerHTML = `<div class="empty" style="background:var(--soft)">${ICONS.radar}<p style="font-weight:600">เลือกผู้สมัครจากรายการด้านซ้าย</p><p class="muted" style="font-size:14px">อย่างน้อย 2 คนเพื่อเปรียบเทียบ</p></div>`;
         return;

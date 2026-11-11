@@ -484,3 +484,41 @@ tbody th { color: var(--ink); border-top: 1px solid #EFEDE7; }
   background-repeat: no-repeat; background-position: right 11px center; }
 .decision-select:hover { box-shadow: 0 0 0 1.5px var(--ink) inset; }
 .decision-select option { background: #fff; color: var(--ink); }
+
+/* ---------- HRS usage tab (การใช้งาน) ---------- */
+.usage-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.usage-bar .seg { grid-auto-columns: auto; }
+.usage-bar .seg button { min-height: 40px; }
+.usage-acct { width: auto; min-width: 220px; min-height: 48px; }
+.kpi-sub { font-size: 13px; font-weight: 600; opacity: .85; position: relative; }
+.daybars { display: flex; flex-direction: column; gap: 8px; }
+.daybars-plot { height: 180px; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px; align-items: end; border-bottom: 1px solid #CFCDC6; }
+.daybar { height: 100%; display: flex; align-items: flex-end; cursor: default; }
+.daybar > div { width: 100%; min-height: 0; background: var(--violet); border-radius: 4px 4px 0 0; }
+.daybar:hover > div { background: #3A22C9; }
+.daybars-axis { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px; font-size: 12px; color: var(--muted); }
+.daybars-axis span { white-space: nowrap; overflow: visible; }
+.usage-table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px; }
+.usage-table th, .usage-table td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #ECEAE3; white-space: nowrap; }
+.usage-table th:first-child, .usage-table thead th:first-child { text-align: left; }
+.usage-table thead th { font-size: 13px; color: var(--muted); font-weight: 600; }
+.usage-table td { font-variant-numeric: tabular-nums; font-weight: 600; }
+.usage-idle th { color: var(--muted); }
+.usage-log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow-y: auto; font-size: 14px; }
+.usage-log li { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--soft); }
+.usage-when { color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) { .usage-log li { grid-template-columns: 1fr; gap: 2px; } .usage-acct { min-width: 0; flex: 1; } }
+.usage-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.usage-card { border: 1px solid #ECEAE3; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+.usage-card header { display: flex; flex-direction: column; gap: 2px; }
+.usage-card h3 { font-size: 17px; font-weight: 700; }
+.usage-card header .muted { font-size: 13px; }
+.usage-card.is-idle { background: var(--soft); }
+.usage-stats { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.usage-stats div { background: var(--soft); border-radius: 12px; padding: 8px 10px; }
+.usage-card.is-idle .usage-stats div { background: #fff; }
+.usage-stats dt { font-size: 12px; color: var(--muted); font-weight: 600; }
+.usage-stats dd { margin: 0; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.daybars-mini { height: 64px; }
+.usage-matrix td:last-child, .usage-matrix tfoot td, .usage-matrix tfoot th { background: var(--soft); }
+.usage-matrix tfoot th { text-align: left; }

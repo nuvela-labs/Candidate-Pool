@@ -1,5 +1,6 @@
 // Candidate profile popup: everything about one candidate in one place.
 // `actions` = [{ id, label, primary, danger }]; the popup closes before onAction runs.
+import { store } from './data/store.js';
 import {
   esc, ICONS, HRS, POOL, DECISION_STYLE, decisionLabel, INTERVIEW_STATUS, MODE_LABEL, avatarFor, recommendationFor, recLabel,
   fmtDate, fmtDateTime, baht, pct, openModal, isNew, NEW_BADGE, holdLeft, safeUrl, locLabel, unitFullLabel, matchColor, candScore, scoredDims, DIMENSIONS, dimInfo, NOTE_FROM, preTag, scoreNote
@@ -66,6 +67,7 @@ function interviewSection(c) {
 
 // showContact: HRS only; units never receive email/phone in the first place.
 export function openProfile(c, { actions = [], onAction, showSalary = true, showContact = false } = {}) {
+  store.track('profile_view', { candidateId: c.id });
   const av = avatarFor(c.id);
   const rec = recommendationFor(c);
   const m = candScore(c) ?? 0;

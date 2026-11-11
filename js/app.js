@@ -36,6 +36,7 @@ async function route() {
   if (!session) hash = '#/login';
   else if (hash !== homeFor(session)) hash = homeFor(session);
   if (location.hash !== hash) { location.replace(hash); return; }
+  if (session) store.trackVisit();
   window.scrollTo(0, 0);
 
   if (hash === '#/pjt') return mountPjt(root, ctx);

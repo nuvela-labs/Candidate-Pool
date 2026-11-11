@@ -8,6 +8,40 @@ import { CONFIG } from '../config.js';
 const KEY = 'candidate-pool-demo-v3';
 const SESSION_KEY = 'candidate-pool-demo-session';
 
+
+// Sample usage log for the last 30 days, so the "การใช้งาน" tab has something to show in the demo.
+function sampleEvents() {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const ids = SEED_CANDIDATES.map((c) => c.id);
+  const who = [
+    { userId: 'admin-hr', role: 'admin', unit: null, w: 1.4, acts: { login: 1, profile_view: 3, decision: 1, interview_set: 0.6, move: 0.5, candidate_add: 0.6, candidate_edit: 0.8, compare: 0.3, excel_export: 0.15, resume_import: 0.4 } },
+    { userId: 'pjt-pd-1', role: 'pjt', unit: 'PJT-PD-1', w: 1.2, acts: { login: 1, profile_view: 2.5, pick: 0.6, return: 0.2, interview_request: 0.4, compare: 0.8 } },
+    { userId: 'pjt-pd-2', role: 'pjt', unit: 'PJT-PD-2', w: 0.8, acts: { login: 0.8, profile_view: 1.6, pick: 0.4, return: 0.1, interview_request: 0.2, compare: 0.3 } },
+    { userId: 'pjt-pd-3', role: 'pjt', unit: 'PJT-PD-3', w: 0.35, acts: { login: 0.5, profile_view: 0.8, pick: 0.15, interview_request: 0.05 } },
+    { userId: 'pjt-pd-4', role: 'pjt', unit: 'PJT-PD-4', w: 0, acts: {} }
+  ];
+  const out = [];
+  const day = 86400000, now = Date.now();
+  for (let d = 30; d >= 1; d--) {
+    const weekend = [0, 6].includes(new Date(now - d * day).getDay());
+    for (const u of who) {
+      if (weekend || rnd() > u.w) continue;
+      for (const [action, rate] of Object.entries(u.acts)) {
+        const n = Math.floor(rate * (0.5 + rnd() * 1.5) + rnd());
+        for (let i = 0; i < n; i++) {
+          const midnight = new Date(now - d * day); midnight.setHours(0, 0, 0, 0);
+          const at = new Date(midnight.getTime() + (8.5 + rnd() * 9) * 3600000).toISOString();
+          const withCand = !['login', 'compare', 'excel_export', 'resume_import'].includes(action);
+          out.push({ at, userId: u.userId, role: u.role, unit: u.unit, action,
+            candidateId: withCand ? ids[Math.floor(rnd() * ids.length)] : null,
+            meta: action === 'compare' ? { count: 2 + Math.floor(rnd() * 3) } : {} });
+        }
+      }
+    }
+  }
+  return out.sort((a, b) => (a.at < b.at ? 1 : -1)).map((e, i) => ({ id: i + 1, ...e }));
+}
 // Spread "entered the system" over the past weeks so a few sample rows show "New".
 const fresh = () => ({
   candidates: structuredClone(SEED_CANDIDATES).map((c, i) => ({
@@ -17,6 +51,7 @@ const fresh = () => ({
   users: structuredClone(SEED_USERS),
   divisions: structuredClone(CONFIG.divisions),
   notifications: [],
+  events: sampleEvents(),
   nextNotif: 1
 });
 function load() {
@@ -24,7 +59,9 @@ function load() {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const d = JSON.parse(raw);
-      if (!d.divisions) d.divisions = structuredClone(CONFIG.divisions);      return d;
+      if (!d.divisions) d.divisions = structuredClone(CONFIG.divisions);
+      if (!d.events) d.events = sampleEvents();
+      return d;
     }
   } catch (e) { /* storage blocked: fall through to fresh data */ }
   return fresh();
@@ -285,5 +322,19 @@ export const demoStore = {
     save();
   },
 
+
+  // ---- usage log ----
+  async logEvent({ action, candidateId = null, meta = {} }) {
+    if (!session) return;
+    const id = (db.events[0] ? db.events[0].id : 0) + 1;
+    db.events.unshift({ id, at: new Date().toISOString(), userId: session.userId, role: session.role, unit: session.unit,
+      action, candidateId, meta });
+    db.events.length = Math.min(db.events.length, 5000);
+    save();
+  },
+  async listEvents({ since } = {}) {
+    requireSession('admin');
+    return db.events.filter((e) => !since || e.at >= since);
+  },
   async resetDemoData() { db = fresh(); save(); }
 };
